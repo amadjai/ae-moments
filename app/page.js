@@ -1060,7 +1060,6 @@ export default function Home() {
 
             <div
               className={`usp-stack-wrap ${isUspStackEntered ? "is-entered" : ""}`}
-              data-reveal
               role="region"
               aria-label="StudioBooth showcase gallery"
               tabIndex={0}
