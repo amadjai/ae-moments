@@ -1848,12 +1848,29 @@ export default function Home() {
     );
   };
 
+  const scrollToPackages = (tab) => {
+    if (tab) {
+      setActiveTab(tab);
+    }
+    if (typeof window !== "undefined") {
+      document
+        .getElementById("packages")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const openPackagesSection = (event) => {
+    if (event) {
+      event.preventDefault();
+    }
+    scrollToPackages();
+  };
+
   const openBundleTab = (event) => {
     if (event) {
       event.preventDefault();
     }
-    setActiveTab("bundle");
-    setIsQuoteModalOpen(true);
+    scrollToPackages("bundle");
   };
 
   const handleUspKeyDown = (event) => {
@@ -2000,7 +2017,7 @@ export default function Home() {
               <a
                 href="#packages"
                 className="button outline hero-secondary"
-                onClick={openQuoteModal}
+                onClick={openPackagesSection}
                 style={{ color: "#111" }}
               >
                 View Packages
