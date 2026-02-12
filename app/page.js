@@ -281,7 +281,8 @@ const upgrades = [
     summary: "We print and place duplicate strips directly into your guest book.",
     price: 55,
     priceLabel: "$55",
-    photo: uspGalleryMedia[0]
+    photo:
+      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc63a44964ef208aa17c.webp"
   },
   {
     id: "leather-guest-book",
@@ -290,7 +291,8 @@ const upgrades = [
     summary: "Premium leather guest book kit styled for elegant keepsake signing.",
     price: 135,
     priceLabel: "$135",
-    photo: uspGalleryMedia[1]
+    photo:
+      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc635ea0712e00d70579.webp"
   },
   {
     id: "photo-album",
@@ -299,7 +301,8 @@ const upgrades = [
     summary: "Commemorative event album that collects your standout moments.",
     price: 100,
     priceLabel: "$100",
-    photo: uspGalleryMedia[2]
+    photo:
+      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc635ea0710545d7057b.jpg"
   },
   {
     id: "polaroid-3x4",
@@ -308,7 +311,8 @@ const upgrades = [
     summary: "Retro-style mini print format with a classic border finish.",
     price: 165,
     priceLabel: "$165",
-    photo: uspGalleryMedia[3]
+    photo:
+      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc635ea0716cddd7057a.webp"
   },
   {
     id: "postcard-4x6",
@@ -317,7 +321,8 @@ const upgrades = [
     summary: "Larger postcard print format for premium, frame-ready outputs.",
     price: 165,
     priceLabel: "$165",
-    photo: uspGalleryMedia[4]
+    photo:
+      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc63a449644c858aa17b.webp"
   },
   {
     id: "glam-booth",
@@ -326,7 +331,8 @@ const upgrades = [
     summary: "High-contrast black-and-white look with smooth, flattering skin finish.",
     price: 110,
     priceLabel: "$110",
-    photo: uspGalleryMedia[5]
+    photo:
+      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc6395bc4a69fff55c3d.webp"
   },
   {
     id: "luxury-rose-wall",
@@ -335,7 +341,8 @@ const upgrades = [
     summary: "Statement floral backdrop for editorial portraits and styled arrivals.",
     price: 440,
     priceLabel: "$440",
-    photo: uspGalleryMedia[6]
+    photo:
+      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc635b7c9687ccdd63e7.webp"
   },
   {
     id: "audio-guest-book",
@@ -344,7 +351,8 @@ const upgrades = [
     summary: "Capture heartfelt voice messages your couple or host can replay later.",
     price: 300,
     priceLabel: "$300",
-    photo: uspGalleryMedia[7]
+    photo:
+      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc63000761703fba2861.webp"
   },
   {
     id: "dry-ice",
@@ -353,7 +361,8 @@ const upgrades = [
     summary: "Cloud-floor effect for cinematic first dance and reception entrance.",
     price: 420,
     priceLabel: "$420",
-    photo: uspGalleryMedia[8]
+    photo:
+      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc630084985ede7b56a0.jpeg"
   },
   {
     id: "fireworks-dry-ice",
@@ -362,7 +371,8 @@ const upgrades = [
     summary: "Full wow-moment package for dramatic stage reveal and spotlight entry.",
     price: 1100,
     priceLabel: "from $1,100",
-    photo: uspGalleryMedia[9]
+    photo:
+      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc6324813cdf927d0cbb.jpg"
   },
   {
     id: "dj-service",
@@ -371,7 +381,8 @@ const upgrades = [
     summary: "Subject-to-availability DJ set to keep energy and dancefloor flow high.",
     price: 1200,
     priceLabel: "from $1,200",
-    photo: uspGalleryMedia[10]
+    photo:
+      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc635ea0711e86d7057c.jpg"
   }
 ];
 
