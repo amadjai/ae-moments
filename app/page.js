@@ -1035,6 +1035,7 @@ export default function Home() {
 
       <section className="section hero" id="top">
         <div className="hero-pattern" />
+        <div className="hero-ambient" aria-hidden="true" />
         <div className="hero-rings" />
         <div className="container hero-centered">
           <div className="testimonial-ticker ticker-left" aria-hidden="true">
