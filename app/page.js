@@ -770,6 +770,90 @@ function FAQItem({ item, index, activeFaq, setActiveFaq }) {
   );
 }
 
+function SocialProofSection() {
+  return (
+    <section className="section social-proof-v2" id="reviews">
+      <div className="container social-proof-shell">
+        <div className="social-proof-top">
+          <article className="sp-panel sp-intro" data-reveal>
+            <p className="sp-kicker">What our clients say</p>
+            <h2>Proof your event is in expert hands.</h2>
+            <p className="sp-intro-copy">
+              From wedding timelines to high-volume activations, clients trust
+              AE Moments to deliver clear communication, premium output, and a
+              smooth guest experience.
+            </p>
+            <p className="sp-note">
+              Real feedback sourced from public Google Reviews for AE Moments.
+            </p>
+          </article>
+
+          <article className="sp-panel sp-spotlight" data-reveal>
+            <p className="sp-spotlight-title">Spotlight</p>
+            <blockquote className="sp-quote">“{spotlightReview.quote}”</blockquote>
+            <div className="sp-person">
+              <span className="sp-avatar" aria-hidden="true">
+                {spotlightReview.author
+                  .split(" ")
+                  .map((part) => part[0])
+                  .join("")
+                  .slice(0, 2)}
+              </span>
+              <p className="sp-person-name">{spotlightReview.author}</p>
+              <p className="sp-person-role">{spotlightReview.role}</p>
+            </div>
+          </article>
+        </div>
+
+        <div className="sp-gallery-ticker" data-reveal>
+          <div className="sp-gallery-track" aria-hidden="true">
+            {[...socialProofGalleryMedia, ...socialProofGalleryMedia].map(
+              (media, index) => (
+                <figure key={`${media}-${index}`} className="sp-gallery-item">
+                  <img
+                    src={media}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </figure>
+              )
+            )}
+          </div>
+        </div>
+
+        <div className="sp-review-grid" data-reveal>
+          {socialProofReviews.map((review) => (
+            <article key={review.author} className="sp-review-card">
+              <div className="sp-review-top">
+                <div className="sp-review-google">
+                  <img src={googleLogoUrl} alt="" aria-hidden="true" />
+                  <span>Google</span>
+                </div>
+                <p className="sp-review-stars">★★★★★</p>
+              </div>
+              <p className="sp-review-text">“{review.summary}”</p>
+              <div className="sp-review-meta">
+                <span className="sp-review-avatar" aria-hidden="true">
+                  {review.author
+                    .split(" ")
+                    .map((part) => part[0])
+                    .join("")
+                    .slice(0, 2)}
+                </span>
+                <div>
+                  <p className="sp-review-author">{review.author}</p>
+                  <p className="sp-review-role">{review.role}</p>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState("standard");
   const [activeFaq, setActiveFaq] = useState(0);
@@ -782,6 +866,7 @@ export default function Home() {
   const [upgradeFlyers, setUpgradeFlyers] = useState([]);
   const uspSwiperRef = useRef(null);
   const upgradeFolderRef = useRef(null);
+  const mobileQuoteRef = useRef(null);
   const uspLeftSteps = uspSteps.slice(0, 2);
   const uspRightSteps = uspSteps.slice(2);
   const upgradesByCategory = useMemo(
@@ -805,8 +890,12 @@ export default function Home() {
   );
 
   const spawnUpgradeFlyer = (item, triggerNode) => {
-    const folderNode = upgradeFolderRef.current;
-    if (!folderNode || !triggerNode || typeof window === "undefined") return;
+    if (!triggerNode || typeof window === "undefined") return;
+    const isMobileViewport = window.matchMedia("(max-width: 820px)").matches;
+    const folderNode = isMobileViewport
+      ? mobileQuoteRef.current ?? upgradeFolderRef.current
+      : upgradeFolderRef.current ?? mobileQuoteRef.current;
+    if (!folderNode) return;
 
     const sourceCard = triggerNode.closest(".upgrade-dish-card");
     const sourceNode =
@@ -1175,6 +1264,8 @@ export default function Home() {
         </div>
       </section>
 
+      <SocialProofSection />
+
       <section className="section packages" id="packages">
         <div className="container">
           <span className="packages-glow" aria-hidden="true" data-reveal />
@@ -1326,6 +1417,21 @@ export default function Home() {
                         className={`upgrade-dish-card ${
                           selectedUpgradeIds.has(item.id) ? "is-selected" : ""
                         }`}
+                        role="button"
+                        tabIndex={0}
+                        aria-pressed={selectedUpgradeIds.has(item.id)}
+                        aria-label={`${
+                          selectedUpgradeIds.has(item.id) ? "Remove" : "Add"
+                        } ${item.name}`}
+                        onClick={(event) =>
+                          toggleUpgradeSelection(item, event.currentTarget)
+                        }
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            toggleUpgradeSelection(item, event.currentTarget);
+                          }
+                        }}
                       >
                         <img
                           className="upgrade-dish-thumb"
@@ -1344,19 +1450,15 @@ export default function Home() {
                           className={`upgrade-check-btn ${
                             selectedUpgradeIds.has(item.id) ? "is-selected" : ""
                           }`}
-                          onClick={(event) =>
-                            toggleUpgradeSelection(item, event.currentTarget)
-                          }
-                          aria-pressed={selectedUpgradeIds.has(item.id)}
-                          aria-label={`${
-                            selectedUpgradeIds.has(item.id) ? "Remove" : "Add"
-                          } ${item.name}`}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            toggleUpgradeSelection(item, event.currentTarget);
+                          }}
+                          aria-hidden="true"
+                          tabIndex={-1}
                         >
                           <span className="upgrade-check-icon" aria-hidden="true">
-                            ✓
-                          </span>
-                          <span>
-                            {selectedUpgradeIds.has(item.id) ? "Added" : "Select"}
+                            {selectedUpgradeIds.has(item.id) ? "✓" : ""}
                           </span>
                         </button>
                       </article>
@@ -1452,6 +1554,35 @@ export default function Home() {
         </div>
       </section>
 
+      <a
+        href="#quote"
+        ref={mobileQuoteRef}
+        className={`upgrade-mobile-quote ${basketCount > 0 ? "is-visible" : ""}`}
+        aria-label={`Request quote with ${basketCount} selected upgrade${
+          basketCount === 1 ? "" : "s"
+        }`}
+      >
+        <span className="upgrade-mobile-folder" aria-hidden="true">
+          <span className="upgrade-mobile-folder-tab" />
+          <span className="upgrade-mobile-folder-stack">
+            {basketStackPhotos.slice(-3).map((photo, index) => (
+              <span
+                key={`${photo}-mobile-${index}`}
+                className="upgrade-mobile-stack-photo"
+                style={{
+                  "--mobile-stack-index": index,
+                  backgroundImage: `url(${photo})`
+                }}
+              />
+            ))}
+          </span>
+        </span>
+        <span className="upgrade-mobile-quote-copy">
+          <strong>Request Quote</strong>
+          <span>{basketCount} add-on{basketCount === 1 ? "" : "s"}</span>
+        </span>
+      </a>
+
       <section className="section compare" id="compare">
         <div className="container">
           <p className="eyebrow" data-reveal>
@@ -1498,88 +1629,6 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section social-proof-v2" id="reviews">
-        <div className="container social-proof-shell">
-          <div className="social-proof-top">
-            <article className="sp-panel sp-intro" data-reveal>
-              <p className="sp-kicker">What our clients say</p>
-              <h2>Proof your event is in expert hands.</h2>
-              <p className="sp-intro-copy">
-                From wedding timelines to high-volume activations, clients trust
-                AE Moments to deliver clear communication, premium output, and a
-                smooth guest experience.
-              </p>
-              <p className="sp-note">
-                Real feedback sourced from public Google Reviews for AE Moments.
-              </p>
-            </article>
-
-            <article className="sp-panel sp-spotlight" data-reveal>
-              <p className="sp-spotlight-title">Spotlight</p>
-              <blockquote className="sp-quote">
-                “{spotlightReview.quote}”
-              </blockquote>
-              <div className="sp-person">
-                <span className="sp-avatar" aria-hidden="true">
-                  {spotlightReview.author
-                    .split(" ")
-                    .map((part) => part[0])
-                    .join("")
-                    .slice(0, 2)}
-                </span>
-                <p className="sp-person-name">{spotlightReview.author}</p>
-                <p className="sp-person-role">{spotlightReview.role}</p>
-              </div>
-            </article>
-          </div>
-
-          <div className="sp-gallery-ticker" data-reveal>
-            <div className="sp-gallery-track" aria-hidden="true">
-              {[...socialProofGalleryMedia, ...socialProofGalleryMedia].map(
-                (media, index) => (
-                  <figure key={`${media}-${index}`} className="sp-gallery-item">
-                    <img
-                      src={media}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </figure>
-                )
-              )}
-            </div>
-          </div>
-
-          <div className="sp-review-grid" data-reveal>
-            {socialProofReviews.map((review) => (
-              <article key={review.author} className="sp-review-card">
-                <div className="sp-review-top">
-                  <div className="sp-review-google">
-                    <img src={googleLogoUrl} alt="" aria-hidden="true" />
-                    <span>Google</span>
-                  </div>
-                  <p className="sp-review-stars">★★★★★</p>
-                </div>
-                <p className="sp-review-text">“{review.summary}”</p>
-                <div className="sp-review-meta">
-                  <span className="sp-review-avatar" aria-hidden="true">
-                    {review.author
-                      .split(" ")
-                      .map((part) => part[0])
-                      .join("")
-                      .slice(0, 2)}
-                  </span>
-                  <div>
-                    <p className="sp-review-author">{review.author}</p>
-                    <p className="sp-review-role">{review.role}</p>
-                  </div>
-                </div>
-              </article>
-            ))}
           </div>
         </div>
       </section>
@@ -1694,7 +1743,9 @@ export default function Home() {
                 rel="noreferrer"
                 aria-label="Instagram"
               >
-                IG
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5a4.25 4.25 0 0 0-4.25-4.25h-8.5Zm8.9 2.2a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7.001A3.5 3.5 0 0 0 12 8.5Z" />
+                </svg>
               </a>
               <a
                 href={facebookUrl}
@@ -1702,7 +1753,9 @@ export default function Home() {
                 rel="noreferrer"
                 aria-label="Facebook"
               >
-                FB
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M13.5 22v-8h2.8l.42-3.25H13.5V8.67c0-.94.27-1.58 1.62-1.58h1.73V4.2a21.5 21.5 0 0 0-2.52-.13c-2.5 0-4.2 1.52-4.2 4.33v2.35H7.3V14h2.83v8h3.37Z" />
+                </svg>
               </a>
             </div>
             <img className="site-footer-logo" src={siteLogoUrl} alt="AE Moments" />

@@ -2064,6 +2064,7 @@ p {
   width: 100%;
   height: 100%;
   min-height: 25.6rem;
+  -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
   transition: transform 760ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -2079,10 +2080,15 @@ p {
   flex-direction: column;
   border-radius: 1.9rem;
   overflow: hidden;
+  -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  transition: opacity 220ms ease;
 }
 
 .access-card-front {
+  transform: rotateY(0deg) translateZ(0.1px);
   border: 1px solid rgba(255, 255, 255, 0.11);
   background: linear-gradient(165deg,
       #05070d 0%,
@@ -2391,13 +2397,24 @@ p {
 }
 
 .access-card-back {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(0.1px);
+  visibility: hidden;
   padding: 1.12rem 0.95rem 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: linear-gradient(160deg, #1c212b 0%, #131822 55%, #1a202c 100%);
   box-shadow:
     inset 1px 1px 0 rgba(255, 255, 255, 0.05),
     inset -1px -1px 0 rgba(0, 0, 0, 0.22);
+}
+
+.access-flip.is-flipped .access-card-front {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.access-flip.is-flipped .access-card-back {
+  visibility: visible;
 }
 
 .access-back-kicker {
@@ -2573,12 +2590,19 @@ p {
   grid-template-columns: 4.2rem minmax(0, 1fr) auto;
   gap: 0.65rem;
   align-items: center;
+  cursor: pointer;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
 }
 
 .upgrade-dish-card.is-selected {
   border-color: rgba(255, 255, 255, 0.84);
   background: rgba(233, 233, 233, 0.94);
   box-shadow: inset 6px 6px 12px #d4d4d4, inset -6px -6px 12px #fbfbfb;
+}
+
+.upgrade-dish-card:focus-visible {
+  outline: 2px solid rgba(16, 24, 36, 0.34);
+  outline-offset: 2px;
 }
 
 .upgrade-dish-thumb {
@@ -2611,39 +2635,45 @@ p {
 }
 
 .upgrade-check-btn {
-  min-width: 5.4rem;
-  min-height: 2.2rem;
-  padding: 0 0.72rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(19, 24, 36, 0.28);
-  background: rgba(246, 249, 255, 0.92);
+  width: 2.05rem;
+  min-width: 2.05rem;
+  min-height: 2.05rem;
+  height: 2.05rem;
+  padding: 0;
+  border-radius: 999px;
+  border: 1.6px solid rgba(22, 30, 45, 0.34);
+  background: rgba(244, 246, 252, 0.9);
+  box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.7), inset -1px -1px 2px rgba(194, 203, 220, 0.52);
   color: #142137;
   font: inherit;
-  font-size: 0.78rem;
-  font-weight: 760;
+  font-size: 0.9rem;
+  font-weight: 780;
   cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease,
+    border-color 0.18s ease, color 0.18s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.34rem;
+  gap: 0;
 }
 
 .upgrade-check-icon {
-  width: 1.2rem;
-  height: 1.2rem;
-  border-radius: 50%;
-  border: 1px solid rgba(20, 30, 44, 0.28);
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0;
+  border: 0;
   display: inline-grid;
   place-items: center;
-  font-size: 0.72rem;
+  font-size: 0.92rem;
   line-height: 1;
-  color: rgba(20, 34, 52, 0.48);
+  color: transparent;
+  background: transparent;
+  pointer-events: none;
 }
 
 .upgrade-check-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(10, 14, 22, 0.16);
+  box-shadow: 0 6px 12px rgba(10, 14, 22, 0.14);
 }
 
 .upgrade-check-btn:active {
@@ -2654,11 +2684,10 @@ p {
   border-color: #101216;
   background: #101216;
   color: #ffffff;
+  box-shadow: 0 8px 16px rgba(16, 18, 22, 0.2);
 }
 
 .upgrade-check-btn.is-selected .upgrade-check-icon {
-  border-color: rgba(255, 255, 255, 0.32);
-  background: rgba(255, 255, 255, 0.16);
   color: #ffffff;
 }
 
@@ -2855,6 +2884,16 @@ p {
   background: rgba(248, 250, 255, 0.92);
   color: #111926;
   cursor: pointer;
+}
+
+.upgrade-mobile-quote {
+  display: none;
+}
+
+.upgrade-mobile-folder,
+.upgrade-mobile-folder-tab,
+.upgrade-mobile-stack-photo {
+  display: block;
 }
 
 .upgrade-fly-layer {
@@ -4213,7 +4252,7 @@ p {
   }
 
   .audience-logo-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .audience-logo-item {
@@ -4729,6 +4768,13 @@ body {
   transform: translateY(-1px);
 }
 
+.site-footer-socials a svg {
+  width: 1rem;
+  height: 1rem;
+  display: block;
+  fill: currentColor;
+}
+
 .site-footer-logo {
   width: min(100%, 19rem);
   height: auto;
@@ -5193,21 +5239,22 @@ body {
   }
 
   .upgrade-dish-card {
-    grid-template-columns: 3.6rem minmax(0, 1fr);
-    gap: 0.56rem;
-    align-items: start;
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
+    gap: 0.62rem;
+    align-items: center;
   }
 
   .upgrade-dish-thumb {
-    width: 3.6rem;
-    height: 3.6rem;
+    width: 4rem;
+    height: 4rem;
   }
 
   .upgrade-check-btn {
-    grid-column: 1 / -1;
-    width: 100%;
+    grid-column: auto;
+    width: 2.05rem;
+    min-width: 2.05rem;
     min-height: 2.05rem;
-    margin-top: 0.12rem;
+    margin-top: 0;
   }
 
   .upgrade-folder {
@@ -5226,6 +5273,175 @@ body {
 
   .upgrade-basket-list {
     max-height: none;
+  }
+
+  .upgrade-basket-panel {
+    display: none;
+  }
+
+  .upgrade-mobile-quote {
+    position: fixed;
+    left: 0.72rem;
+    bottom: max(0.9rem, env(safe-area-inset-bottom));
+    z-index: 120;
+    min-height: 3rem;
+    padding: 0.38rem 0.62rem 0.38rem 0.42rem;
+    border-radius: 0.98rem;
+    border: 1px solid rgba(255, 255, 255, 0.88);
+    background: rgba(233, 236, 243, 0.98);
+    box-shadow: 9px 9px 20px rgba(200, 206, 221, 0.8), -8px -8px 18px rgba(255, 255, 255, 0.88);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    will-change: transform, opacity;
+    transform: translate3d(0, 10px, 0) scale(0.97);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.52rem;
+    text-decoration: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease, transform 220ms ease;
+  }
+
+  .upgrade-mobile-quote.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    pointer-events: auto;
+  }
+
+  .upgrade-mobile-folder {
+    position: relative;
+    width: 2.4rem;
+    height: 2rem;
+    border-radius: 0.56rem;
+    border: 1px solid rgba(17, 24, 36, 0.2);
+    background: linear-gradient(175deg, rgba(251, 252, 255, 0.95), rgba(241, 245, 252, 0.9));
+    overflow: visible;
+  }
+
+  .upgrade-mobile-folder-tab {
+    position: absolute;
+    left: 0.38rem;
+    top: -0.34rem;
+    width: 1.02rem;
+    height: 0.42rem;
+    border-radius: 0.35rem 0.35rem 0 0;
+    border: 1px solid rgba(17, 24, 36, 0.2);
+    border-bottom: 0;
+    background: rgba(249, 251, 255, 0.94);
+  }
+
+  .upgrade-mobile-folder-stack {
+    position: absolute;
+    left: 50%;
+    top: -0.36rem;
+    width: 2.1rem;
+    height: 1.3rem;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .upgrade-mobile-stack-photo {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.28rem;
+    border: 1px solid rgba(255, 255, 255, 0.92);
+    background-size: cover;
+    background-position: center;
+    transform: translateX(calc((var(--mobile-stack-index) - 1) * 0.48rem))
+      rotate(calc((var(--mobile-stack-index) - 1) * 12deg));
+    box-shadow: 0 6px 12px rgba(14, 19, 28, 0.18);
+  }
+
+  .upgrade-mobile-quote-copy {
+    display: grid;
+    line-height: 1.05;
+    gap: 0.16rem;
+    color: #111926;
+  }
+
+  .upgrade-mobile-quote-copy strong {
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 790;
+  }
+
+  .upgrade-mobile-quote-copy span {
+    font-size: 0.62rem;
+    color: #5b6474;
+    letter-spacing: 0.01em;
+  }
+
+  .compare-shell {
+    margin-top: 1rem;
+    border-radius: 1rem;
+  }
+
+  .compare-matrix {
+    min-width: 500px;
+  }
+
+  .compare-matrix-head,
+  .compare-matrix-row {
+    grid-template-columns: 1.2fr 0.9fr 0.9fr;
+  }
+
+  .compare-feature-head,
+  .compare-col-head {
+    min-height: 4.2rem;
+    padding: 0.72rem 0.62rem;
+  }
+
+  .compare-feature-head {
+    font-size: 0.64rem;
+  }
+
+  .compare-col-head p {
+    font-size: 0.78rem;
+  }
+
+  .compare-ae-chip {
+    min-width: 1.6rem;
+    min-height: 1.6rem;
+    padding: 0 0.38rem;
+    top: 0.42rem;
+    border-radius: 0.52rem;
+    font-size: 0.62rem;
+  }
+
+  .compare-col-head-ae p {
+    margin-top: 1.15rem;
+  }
+
+  .compare-feature-cell,
+  .compare-value-cell {
+    min-height: 4.8rem;
+    padding: 0.68rem 0.62rem;
+    gap: 0.42rem;
+  }
+
+  .compare-feature-cell p {
+    font-size: 0.81rem;
+    line-height: 1.24;
+  }
+
+  .compare-status {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.82rem;
+  }
+
+  .compare-value-cell p {
+    font-size: 0.74rem;
+    line-height: 1.3;
   }
 }
 
