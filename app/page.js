@@ -529,6 +529,118 @@ const facebookUrl = "https://www.facebook.com/aemoments.au";
 const contactEmail = "admin@aemoments.com.au";
 const contactPhone = "+61 452 195 855";
 const contactPhoneHref = "tel:+61452195855";
+const quoteWebhookUrl =
+  "https://services.leadconnectorhq.com/hooks/KbLyUwHy2FrboitSpuPl/webhook-trigger/0f7be69b-cbc2-41a4-bb9f-b384ba8ae0d7";
+
+function buildQuoteWebhookPayload(formData, bundleChoices) {
+  const submittedAt = new Date().toISOString();
+  const guestCount = Number(formData.guestCount) || 0;
+  const isWedding = formData.eventType === "Wedding";
+  const isCuratePath = formData.buildPath === "curate";
+  const isBundlePath = formData.buildPath === "bundle";
+  const quickUpgrades = formData.quickUpgrades ?? [];
+  const selectedPathLabel = isBundlePath
+    ? "Bundle & save money"
+    : "Curate my own photo booth experience";
+
+  const summaryLine = [
+    `${formData.eventType || "Event type not set"}`,
+    `${guestCount || "?"} guests`,
+    formData.eventArea || "Area not set",
+    selectedPathLabel
+  ].join(" | ");
+
+  return {
+    webhookVersion: "1.0",
+    submissionId:
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+    submittedAt,
+    source: {
+      formName: "AE Moments Quote Popup",
+      pageUrl: typeof window !== "undefined" ? window.location.href : "",
+      referrer: typeof document !== "undefined" ? document.referrer : "",
+      timezone:
+        typeof Intl !== "undefined"
+          ? Intl.DateTimeFormat().resolvedOptions().timeZone
+          : "",
+      userAgent: typeof navigator !== "undefined" ? navigator.userAgent : ""
+    },
+    eventBasics: {
+      eventType: formData.eventType || null,
+      eventDateStatus: formData.dateNotSure ? "not_sure_yet" : "confirmed_date",
+      eventDate: formData.dateNotSure ? null : formData.eventDate || null,
+      guestCount,
+      eventSuburbArea: formData.eventArea || null
+    },
+    experiencePath: {
+      pathMode: formData.buildPath || null,
+      pathLabel: selectedPathLabel,
+      curate: isCuratePath
+        ? {
+            boothChoice: formData.boothChoice || null,
+            roamingPrintingPreference: formData.roamingPrinting || null,
+            quickUpgradesSelected: quickUpgrades,
+            quickUpgradesCount: quickUpgrades.length
+          }
+        : null,
+      bundle: isBundlePath
+        ? {
+            bundleChoice: formData.bundleChoice || null,
+            optionsShown: bundleChoices
+          }
+        : null
+    },
+    timingVenue: {
+      hireDuration: formData.hireDuration || null,
+      preferredBoothRunTime: formData.runTime || null,
+      venueName: formData.venueName || null,
+      venueSuburbAddress: formData.venueAddress || null,
+      ceremonyAndReceptionSameVenue: isWedding ? formData.sameVenue || null : null
+    },
+    contact: {
+      name: formData.fullName || null,
+      partnerName: isWedding ? formData.partnerName || null : null,
+      mobile: formData.mobile || null,
+      email: formData.email || null,
+      instagramHandle: formData.instagram || null
+    },
+    notes: {
+      message: formData.message || null
+    },
+    summary: {
+      summaryLine,
+      selectedBooth: isCuratePath ? formData.boothChoice || null : null,
+      selectedBundle: isBundlePath ? formData.bundleChoice || null : null,
+      hasQuickUpgrades: quickUpgrades.length > 0
+    },
+    flat: {
+      event_type: formData.eventType || "",
+      event_date: formData.dateNotSure ? "" : formData.eventDate || "",
+      event_date_not_sure: Boolean(formData.dateNotSure),
+      guest_count: guestCount || "",
+      suburb_area: formData.eventArea || "",
+      build_path: formData.buildPath || "",
+      booth_choice: formData.boothChoice || "",
+      roaming_printing: formData.roamingPrinting || "",
+      bundle_choice: formData.bundleChoice || "",
+      quick_upgrades: quickUpgrades.join(" | "),
+      quick_upgrades_count: quickUpgrades.length,
+      hire_duration: formData.hireDuration || "",
+      preferred_run_time: formData.runTime || "",
+      venue_name: formData.venueName || "",
+      venue_address: formData.venueAddress || "",
+      wedding_same_venue: formData.sameVenue || "",
+      full_name: formData.fullName || "",
+      partner_name: formData.partnerName || "",
+      mobile: formData.mobile || "",
+      email: formData.email || "",
+      instagram_handle: formData.instagram || "",
+      special_requests: formData.message || ""
+    }
+  };
+}
 
 const faqs = [
   {
@@ -622,7 +734,57 @@ const heroReviewerAvatars = [
 ];
 const tickerSlots = ["slot-top", "slot-center", "slot-bottom"];
 
-function StandardCard({ item }) {
+const quoteEventTypes = [
+  "Wedding",
+  "Birthday",
+  "Corporate events",
+  "Product activation",
+  "School formal",
+  "Other occasion"
+];
+
+const quoteQuickUpgrades = [
+  "1 extra print for your own guest book - $55",
+  "Leather guest book + gold pens + glue + 1 extra print - $135",
+  "Photo Album + 1 extra print - $100",
+  "15x15mm magnets (sheets of 100) (min. 1 per guest, rounded up to the nearest 100) - $22",
+  "Upgrade to 3x4\" polaroid prints - $165",
+  "Upgrade to 4x6\" postcard prints - $165",
+  "Glam booth upgrade (black & white photos) - $110",
+  "Rose Wall hire with photo booth package - $440",
+  "Audio Guest Book (white) - $300",
+  "Dry Ice Fog Machine only - $420",
+  "Fireworks & dry ice package - from $1100",
+  "Acrylic welcome sign - from $180",
+  "Acrylic seating chart - from $250",
+  "DJ package + equipment - 5 hours from $1200"
+];
+
+const quoteFormInitialState = {
+  eventType: "",
+  eventDate: "",
+  dateNotSure: false,
+  guestCount: "",
+  eventArea: "",
+  buildPath: "",
+  boothChoice: "",
+  roamingPrinting: "",
+  quickUpgrades: [],
+  bundleChoice: "",
+  hireDuration: "",
+  runTime: "",
+  venueName: "",
+  venueAddress: "",
+  sameVenue: "",
+  fullName: "",
+  partnerName: "",
+  mobile: "",
+  email: "",
+  instagram: "",
+  message: ""
+};
+
+function StandardCard({ item, onCtaClick }) {
   return (
     <article
       className={`card package-card ${item.featured ? "featured" : ""} ${
@@ -673,7 +835,7 @@ function StandardCard({ item }) {
           ))}
         </div>
       </div>
-      <a href="#quote" className="package-action">
+      <a href="#quote" className="package-action" onClick={onCtaClick}>
         Get Started
       </a>
     </article>
@@ -707,15 +869,21 @@ function AudienceIllustration({ type, label }) {
   );
 }
 
-function BundleCard({ item }) {
+function BundleCard({ item, onCtaClick }) {
   return (
     <article
       className={`card bundle-card ${item.featured ? "featured" : ""}`}
       data-reveal
     >
       <div className={`bundle-tier-card ${item.tier}`}>
-        <p className="bundle-tier-name">{item.tier} value pass</p>
-        <p className="bundle-tier-brand">AE Moments</p>
+        <p className="bundle-tier-name">{item.tier} value</p>
+        <img
+          className="bundle-tier-logo"
+          src={siteLogoUrl}
+          alt="AE Moments logo"
+          loading="lazy"
+          decoding="async"
+        />
         <p className="bundle-tier-copy">{item.tierCopy}</p>
         <p className="bundle-tier-save">Save {item.savings}</p>
       </div>
@@ -747,7 +915,7 @@ function BundleCard({ item }) {
           <li key={entry}>{entry}</li>
         ))}
       </ul>
-      <a href="#quote" className="package-action bundle-action">
+      <a href="#quote" className="package-action bundle-action" onClick={onCtaClick}>
         Get Quote / Check Availability
       </a>
     </article>
@@ -865,10 +1033,719 @@ function SocialProofSection() {
   );
 }
 
+function QuoteFormModal({ isOpen, onClose }) {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState(quoteFormInitialState);
+  const [formError, setFormError] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isWedding = formData.eventType === "Wedding";
+  const isBundlePath = formData.buildPath === "bundle";
+  const isCuratePath = formData.buildPath === "curate";
+  const isRoamingBooth = formData.boothChoice === "Roaming Booth (Digitals)";
+  const progressWidth = `${(step / 5) * 100}%`;
+  const stepTag = step === 3 ? (isBundlePath ? "3B" : "3A") : String(step);
+
+  const bundleChoices = useMemo(() => {
+    const recommend = "Recommend for me";
+
+    if (formData.eventType === "Wedding") {
+      return [
+        "Mirror Essentials Bundle",
+        "Wedding Takeover Ultimate Bundle",
+        "Corporate Brand Experience Bundle",
+        recommend
+      ];
+    }
+
+    if (
+      formData.eventType === "Corporate events" ||
+      formData.eventType === "Product activation"
+    ) {
+      return [
+        "Corporate Brand Experience Bundle",
+        "Mirror Essentials Bundle",
+        "Wedding Takeover Ultimate Bundle",
+        recommend
+      ];
+    }
+
+    return [
+      "Mirror Essentials Bundle",
+      "Corporate Brand Experience Bundle",
+      "Wedding Takeover Ultimate Bundle",
+      recommend
+    ];
+  }, [formData.eventType]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setStep(1);
+    setFormData(quoteFormInitialState);
+    setFormError("");
+    setIsSubmitted(false);
+    setIsSubmitting(false);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  const setField = (field, value) => {
+    setFormData((current) => {
+      const next = { ...current, [field]: value };
+
+      if (field === "eventType" && value !== "Wedding") {
+        next.partnerName = "";
+        next.sameVenue = "";
+      }
+
+      if (field === "buildPath") {
+        if (value === "bundle") {
+          next.boothChoice = "";
+          next.roamingPrinting = "";
+          next.quickUpgrades = [];
+        } else {
+          next.bundleChoice = "";
+        }
+      }
+
+      if (field === "boothChoice" && value !== "Roaming Booth (Digitals)") {
+        next.roamingPrinting = "";
+      }
+
+      if (field === "dateNotSure" && value) {
+        next.eventDate = "";
+      }
+
+      return next;
+    });
+  };
+
+  const toggleQuickUpgrade = (value) => {
+    setFormData((current) => {
+      const alreadySelected = current.quickUpgrades.includes(value);
+      return {
+        ...current,
+        quickUpgrades: alreadySelected
+          ? current.quickUpgrades.filter((entry) => entry !== value)
+          : [...current.quickUpgrades, value]
+      };
+    });
+  };
+
+  const validateStep = () => {
+    if (step === 1) {
+      if (!formData.eventType) return "Please select your event type.";
+      if (!formData.dateNotSure && !formData.eventDate) {
+        return "Please choose your event date or tick “Not sure yet”.";
+      }
+      if (!formData.guestCount || Number(formData.guestCount) <= 0) {
+        return "Please enter a valid guest count.";
+      }
+      if (!formData.eventArea.trim()) return "Please add your event suburb or area.";
+    }
+
+    if (step === 2 && !formData.buildPath) {
+      return "Please choose how you'd like to build your experience.";
+    }
+
+    if (step === 3) {
+      if (isCuratePath) {
+        if (!formData.boothChoice) return "Please choose your main booth experience.";
+        if (isRoamingBooth && !formData.roamingPrinting) {
+          return "Please select your roaming printing preference.";
+        }
+      }
+
+      if (isBundlePath && !formData.bundleChoice) {
+        return "Please choose a bundle option.";
+      }
+    }
+
+    if (step === 4) {
+      if (!formData.hireDuration) return "Please select the hire duration.";
+      if (!formData.runTime) return "Please choose a preferred booth run time.";
+      if (!formData.venueAddress.trim()) return "Please add venue suburb or address.";
+    }
+
+    if (step === 5) {
+      if (!formData.fullName.trim()) return "Please enter your name.";
+      if (!formData.mobile.trim()) return "Please enter your mobile number.";
+      if (!formData.email.trim()) return "Please enter your email address.";
+      if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
+        return "Please enter a valid email address.";
+      }
+    }
+
+    return "";
+  };
+
+  const handleNext = () => {
+    if (isSubmitting) return;
+    const error = validateStep();
+    if (error) {
+      setFormError(error);
+      return;
+    }
+    setFormError("");
+    setStep((current) => Math.min(5, current + 1));
+  };
+
+  const handleBack = () => {
+    if (isSubmitting) return;
+    setFormError("");
+    setStep((current) => Math.max(1, current - 1));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const error = validateStep();
+    if (error) {
+      setFormError(error);
+      return;
+    }
+    setFormError("");
+    setIsSubmitting(true);
+
+    const payload = buildQuoteWebhookPayload(formData, bundleChoices);
+
+    try {
+      const response = await fetch(quoteWebhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook request failed with status ${response.status}`);
+      }
+
+      setIsSubmitted(true);
+    } catch (errorCaught) {
+      if (errorCaught instanceof TypeError) {
+        try {
+          await fetch(quoteWebhookUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+              "Content-Type": "text/plain;charset=UTF-8"
+            },
+            body: JSON.stringify(payload)
+          });
+          setIsSubmitted(true);
+        } catch {
+          setFormError(
+            "Couldn’t submit right now. Please try again, or contact us directly."
+          );
+        }
+      } else {
+        setFormError(
+          "Couldn’t submit right now. Please try again, or contact us directly."
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOverlayMouseDown = (event) => {
+    if (event.target === event.currentTarget) {
+      onClose();
+    }
+  };
+
+  return (
+    <div className="quote-modal-overlay" onMouseDown={handleOverlayMouseDown}>
+      <div
+        className="quote-modal-shell"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="quote-modal-title"
+      >
+        <button
+          type="button"
+          className="quote-modal-close"
+          onClick={onClose}
+          aria-label="Close quote form"
+          disabled={isSubmitting}
+        >
+          ×
+        </button>
+
+        {isSubmitted ? (
+          <section className="quote-success-view">
+            <p className="quote-modal-kicker">Quote request received</p>
+            <h3 id="quote-modal-title">Thanks, we’ll confirm availability shortly.</h3>
+            <p>
+              Your event details are in. The AE Moments team will send your
+              recommended setup and pricing quote as soon as possible.
+            </p>
+            <button
+              type="button"
+              className="quote-btn quote-btn-solid"
+              onClick={onClose}
+            >
+              Close
+            </button>
+          </section>
+        ) : (
+          <form className="quote-modal-form" onSubmit={handleSubmit}>
+            <header className="quote-modal-head">
+              <p className="quote-modal-kicker">Step {stepTag} of 5</p>
+              <div className="quote-progress">
+                <span style={{ width: progressWidth }} />
+              </div>
+            </header>
+
+            {formError ? <p className="quote-form-error">{formError}</p> : null}
+
+            {step === 1 && (
+              <section className="quote-step-body">
+                <h3 id="quote-modal-title">Check availability for your event</h3>
+                <label className="quote-field">
+                  <span>Event type*</span>
+                  <select
+                    value={formData.eventType}
+                    onChange={(event) => setField("eventType", event.target.value)}
+                    required
+                  >
+                    <option value="">Select event type</option>
+                    {quoteEventTypes.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="quote-field-row">
+                  <label className="quote-field">
+                    <span>Event date*</span>
+                    <input
+                      type="date"
+                      value={formData.eventDate}
+                      onChange={(event) => setField("eventDate", event.target.value)}
+                      disabled={formData.dateNotSure}
+                    />
+                  </label>
+                  <label className="quote-check-line">
+                    <input
+                      type="checkbox"
+                      checked={formData.dateNotSure}
+                      onChange={(event) => setField("dateNotSure", event.target.checked)}
+                    />
+                    <span>Not sure yet</span>
+                  </label>
+                </div>
+
+                <label className="quote-field">
+                  <span>Guest count*</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={formData.guestCount}
+                    onChange={(event) => setField("guestCount", event.target.value)}
+                    placeholder="e.g. 120"
+                    required
+                  />
+                </label>
+
+                <label className="quote-field">
+                  <span>Event suburb / area*</span>
+                  <input
+                    type="text"
+                    value={formData.eventArea}
+                    onChange={(event) => setField("eventArea", event.target.value)}
+                    placeholder="e.g. Parramatta"
+                    required
+                  />
+                </label>
+              </section>
+            )}
+
+            {step === 2 && (
+              <section className="quote-step-body">
+                <h3 id="quote-modal-title">How would you like to build your experience?</h3>
+                <div className="quote-choice-grid">
+                  <label
+                    className={`quote-choice-card ${
+                      formData.buildPath === "curate" ? "is-active" : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="buildPath"
+                      value="curate"
+                      checked={formData.buildPath === "curate"}
+                      onChange={(event) => setField("buildPath", event.target.value)}
+                    />
+                    <span className="quote-choice-title">
+                      Curate my own photo booth experience
+                    </span>
+                    <span className="quote-choice-copy">
+                      Choose your booth and a few quick add-ons.
+                    </span>
+                  </label>
+                  <label
+                    className={`quote-choice-card ${
+                      formData.buildPath === "bundle" ? "is-active" : ""
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="buildPath"
+                      value="bundle"
+                      checked={formData.buildPath === "bundle"}
+                      onChange={(event) => setField("buildPath", event.target.value)}
+                    />
+                    <span className="quote-choice-title">Bundle & save money ⭐</span>
+                    <span className="quote-choice-copy">
+                      Pick a proven setup and lock in clear savings.
+                    </span>
+                  </label>
+                </div>
+              </section>
+            )}
+
+            {step === 3 && isCuratePath && (
+              <section className="quote-step-body">
+                <h3 id="quote-modal-title">Choose your main experience</h3>
+                <div className="quote-choice-grid">
+                  {[
+                    "Open Air Booth (Prints + Digitals)",
+                    "Mirror Booth (Prints + Digitals)",
+                    "360 Video Booth (360 clips)",
+                    "Roaming Booth (Digitals)"
+                  ].map((option) => (
+                    <label
+                      key={option}
+                      className={`quote-choice-card ${
+                        formData.boothChoice === option ? "is-active" : ""
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="boothChoice"
+                        value={option}
+                        checked={formData.boothChoice === option}
+                        onChange={(event) => setField("boothChoice", event.target.value)}
+                      />
+                      <span className="quote-choice-title">{option}</span>
+                    </label>
+                  ))}
+                </div>
+
+                {isRoamingBooth && (
+                  <fieldset className="quote-fieldset">
+                    <legend>Printing?*</legend>
+                    <div className="quote-inline-options">
+                      {["Digitals only", "Digitals + printing"].map((option) => (
+                        <label
+                          key={option}
+                          className={`quote-chip-option ${
+                            formData.roamingPrinting === option ? "is-active" : ""
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="roamingPrinting"
+                            value={option}
+                            checked={formData.roamingPrinting === option}
+                            onChange={(event) =>
+                              setField("roamingPrinting", event.target.value)
+                            }
+                          />
+                          <span>{option}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                )}
+
+                <fieldset className="quote-fieldset">
+                  <legend>Quick upgrades (optional)</legend>
+                  <p className="quote-helper">
+                    Full upgrades can be suggested later in our reply email.
+                  </p>
+                  <div className="quote-inline-options">
+                    {quoteQuickUpgrades.map((item) => (
+                      <label
+                        key={item}
+                        className={`quote-chip-option ${
+                          formData.quickUpgrades.includes(item) ? "is-active" : ""
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.quickUpgrades.includes(item)}
+                          onChange={() => toggleQuickUpgrade(item)}
+                        />
+                        <span>{item}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              </section>
+            )}
+
+            {step === 3 && isBundlePath && (
+              <section className="quote-step-body">
+                <h3 id="quote-modal-title">Choose a bundle & save</h3>
+                <p className="quote-helper">
+                  Showing the most relevant bundles for your event type.
+                </p>
+                <div className="quote-choice-grid">
+                  {bundleChoices.map((option) => (
+                    <label
+                      key={option}
+                      className={`quote-choice-card ${
+                        formData.bundleChoice === option ? "is-active" : ""
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="bundleChoice"
+                        value={option}
+                        checked={formData.bundleChoice === option}
+                        onChange={(event) => setField("bundleChoice", event.target.value)}
+                      />
+                      <span className="quote-choice-title">{option}</span>
+                    </label>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {step === 4 && (
+              <section className="quote-step-body">
+                <h3 id="quote-modal-title">Event timing & location</h3>
+
+                <fieldset className="quote-fieldset">
+                  <legend>Hire duration*</legend>
+                  <div className="quote-inline-options">
+                    {["3 hours", "4 hours", "5 hours"].map((option) => (
+                      <label
+                        key={option}
+                        className={`quote-chip-option ${
+                          formData.hireDuration === option ? "is-active" : ""
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="hireDuration"
+                          value={option}
+                          checked={formData.hireDuration === option}
+                          onChange={(event) => setField("hireDuration", event.target.value)}
+                        />
+                        <span>{option}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+
+                <label className="quote-field">
+                  <span>Preferred booth run time*</span>
+                  <select
+                    value={formData.runTime}
+                    onChange={(event) => setField("runTime", event.target.value)}
+                    required
+                  >
+                    <option value="">Select preferred timing</option>
+                    <option value="Cocktail hour">Cocktail hour</option>
+                    <option value="After dinner">After dinner</option>
+                    <option value="During dancefloor">During dancefloor</option>
+                    <option value="Not sure (recommend for me)">
+                      Not sure (recommend for me)
+                    </option>
+                  </select>
+                </label>
+
+                <label className="quote-field">
+                  <span>Venue name</span>
+                  <input
+                    type="text"
+                    value={formData.venueName}
+                    onChange={(event) => setField("venueName", event.target.value)}
+                    placeholder="Optional"
+                  />
+                </label>
+
+                <label className="quote-field">
+                  <span>Venue suburb / address*</span>
+                  <input
+                    type="text"
+                    value={formData.venueAddress}
+                    onChange={(event) => setField("venueAddress", event.target.value)}
+                    placeholder="Suburb or full address"
+                    required
+                  />
+                </label>
+
+                {isWedding && (
+                  <fieldset className="quote-fieldset">
+                    <legend>Ceremony & reception same venue? (optional)</legend>
+                    <div className="quote-inline-options">
+                      {["Yes", "No", "Not sure"].map((option) => (
+                        <label
+                          key={option}
+                          className={`quote-chip-option ${
+                            formData.sameVenue === option ? "is-active" : ""
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="sameVenue"
+                            value={option}
+                            checked={formData.sameVenue === option}
+                            onChange={(event) => setField("sameVenue", event.target.value)}
+                          />
+                          <span>{option}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                )}
+              </section>
+            )}
+
+            {step === 5 && (
+              <section className="quote-step-body">
+                <h3 id="quote-modal-title">Where should we send your quote?</h3>
+
+                <label className="quote-field">
+                  <span>Name*</span>
+                  <input
+                    type="text"
+                    value={formData.fullName}
+                    onChange={(event) => setField("fullName", event.target.value)}
+                    required
+                  />
+                </label>
+
+                {isWedding && (
+                  <label className="quote-field">
+                    <span>Partner&apos;s name (optional)</span>
+                    <input
+                      type="text"
+                      value={formData.partnerName}
+                      onChange={(event) => setField("partnerName", event.target.value)}
+                    />
+                  </label>
+                )}
+
+                <div className="quote-field-row">
+                  <label className="quote-field">
+                    <span>Mobile*</span>
+                    <input
+                      type="tel"
+                      value={formData.mobile}
+                      onChange={(event) => setField("mobile", event.target.value)}
+                      required
+                    />
+                  </label>
+                  <label className="quote-field">
+                    <span>Email*</span>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(event) => setField("email", event.target.value)}
+                      required
+                    />
+                  </label>
+                </div>
+
+                <label className="quote-field">
+                  <span>Instagram handle (optional)</span>
+                  <input
+                    type="text"
+                    value={formData.instagram}
+                    onChange={(event) => setField("instagram", event.target.value)}
+                    placeholder="@yourhandle"
+                  />
+                  <small>
+                    Add this if you&apos;d like us to tag you in any content from your
+                    event.
+                  </small>
+                </label>
+
+                <label className="quote-field">
+                  <span>Message / special requests (optional)</span>
+                  <textarea
+                    value={formData.message}
+                    onChange={(event) => setField("message", event.target.value)}
+                    rows={4}
+                  />
+                </label>
+              </section>
+            )}
+
+            <footer className="quote-modal-actions">
+              {step > 1 ? (
+                <button
+                  type="button"
+                  className="quote-btn quote-btn-ghost"
+                  onClick={handleBack}
+                  disabled={isSubmitting}
+                >
+                  Back
+                </button>
+              ) : (
+                <span />
+              )}
+
+              {step < 5 ? (
+                <button
+                  type="button"
+                  className="quote-btn quote-btn-solid"
+                  onClick={handleNext}
+                  disabled={isSubmitting}
+                >
+                  Next
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="quote-btn quote-btn-solid"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? "Submitting..."
+                    : "Check availability & get my quote"}
+                </button>
+              )}
+            </footer>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState("standard");
   const [activeFaq, setActiveFaq] = useState(0);
   const [isAccessFlipped, setIsAccessFlipped] = useState(false);
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [leftVisible, setLeftVisible] = useState([0, 1, 2]);
   const [rightVisible, setRightVisible] = useState([0, 1, 2]);
   const [activeUspShot, setActiveUspShot] = useState(0);
@@ -899,6 +1776,17 @@ export default function Home() {
     () => upgradeBasket.map((item) => item.photo).slice(-4),
     [upgradeBasket]
   );
+
+  const openQuoteModal = (event) => {
+    if (event) {
+      event.preventDefault();
+    }
+    setIsQuoteModalOpen(true);
+  };
+
+  const closeQuoteModal = () => {
+    setIsQuoteModalOpen(false);
+  };
 
   const spawnUpgradeFlyer = (item, triggerNode) => {
     if (!triggerNode || typeof window === "undefined") return;
@@ -960,13 +1848,12 @@ export default function Home() {
     );
   };
 
-  const openBundleTab = () => {
-    setActiveTab("bundle");
-    if (typeof window !== "undefined") {
-      document
-        .getElementById("packages")
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const openBundleTab = (event) => {
+    if (event) {
+      event.preventDefault();
     }
+    setActiveTab("bundle");
+    setIsQuoteModalOpen(true);
   };
 
   const handleUspKeyDown = (event) => {
@@ -1038,7 +1925,7 @@ export default function Home() {
           <a href="#compare">Why Us</a>
           <a href="#faq">FAQ</a>
         </nav>
-        <a href="#quote" className="nav-cta">
+        <a href="#quote" className="nav-cta" onClick={openQuoteModal}>
           <span>Get Quote</span>
           <span className="nav-cta-arrow">→</span>
         </a>
@@ -1104,6 +1991,7 @@ export default function Home() {
               <a
                 href="#quote"
                 className="button solid hero-primary"
+                onClick={openQuoteModal}
                 style={{ color: "#fff" }}
               >
                 <span>Get a Quote / Check Availability</span>
@@ -1112,6 +2000,7 @@ export default function Home() {
               <a
                 href="#packages"
                 className="button outline hero-secondary"
+                onClick={openQuoteModal}
                 style={{ color: "#111" }}
               >
                 View Packages
@@ -1318,13 +2207,21 @@ export default function Home() {
             {activeTab === "standard" ? (
               <div className="package-grid">
                 {standardRates.map((item) => (
-                  <StandardCard key={item.name} item={item} />
+                  <StandardCard
+                    key={item.name}
+                    item={item}
+                    onCtaClick={openQuoteModal}
+                  />
                 ))}
               </div>
             ) : (
               <div className="bundle-grid">
                 {bundles.map((item) => (
-                  <BundleCard key={item.name} item={item} />
+                  <BundleCard
+                    key={item.name}
+                    item={item}
+                    onCtaClick={openQuoteModal}
+                  />
                 ))}
               </div>
             )}
@@ -1543,7 +2440,11 @@ export default function Home() {
               </div>
 
               <div className="upgrade-basket-footer">
-                <a href="#quote" className="upgrade-basket-cta">
+                <a
+                  href="#quote"
+                  className="upgrade-basket-cta"
+                  onClick={openQuoteModal}
+                >
                   Send me custom quote
                 </a>
                 <button
@@ -1581,6 +2482,7 @@ export default function Home() {
         href="#quote"
         ref={mobileQuoteRef}
         className={`upgrade-mobile-quote ${basketCount > 0 ? "is-visible" : ""}`}
+        onClick={openQuoteModal}
         aria-label={`Request quote with ${basketCount} selected upgrade${
           basketCount === 1 ? "" : "s"
         }`}
@@ -1733,6 +2635,8 @@ export default function Home() {
         </div>
       </section>
 
+      <QuoteFormModal isOpen={isQuoteModalOpen} onClose={closeQuoteModal} />
+
       <footer className="site-footer">
         <video
           className="site-footer-video"
@@ -1790,7 +2694,11 @@ export default function Home() {
               <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
               <a href={contactPhoneHref}>{contactPhone}</a>
             </div>
-            <a href="#quote" className="button solid site-footer-button">
+            <a
+              href="#quote"
+              className="button solid site-footer-button"
+              onClick={openQuoteModal}
+            >
               <span>Get Started</span>
               <span className="button-arrow">→</span>
             </a>
@@ -1799,7 +2707,9 @@ export default function Home() {
             <a href="#packages">Packages</a>
             <a href="#compare">Why Us</a>
             <a href="#faq">FAQ</a>
-            <a href="#quote">Contact</a>
+            <a href="#quote" onClick={openQuoteModal}>
+              Contact
+            </a>
           </nav>
           <p className="site-footer-meta">AE Moments © 2026</p>
         </div>
