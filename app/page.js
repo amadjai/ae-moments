@@ -1082,6 +1082,13 @@ export default function Home() {
               unlimited, frame-worthy photos. Real camera, real lighting, real
               prints.
             </p>
+            <img
+              className="hero-mobile-photo"
+              src="https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698db13624813c1899793c73.png"
+              alt="AE Moments photo booth showcase"
+              loading="lazy"
+              decoding="async"
+            />
             <div className="cta-row hero-cta">
               <a
                 href="#quote"
@@ -1099,6 +1106,10 @@ export default function Home() {
                 View Packages
               </a>
             </div>
+            <p className="hero-cta-note">
+              Popular dates fill fast. Send your date and we&apos;ll confirm
+              availability upfront.
+            </p>
             <div className="hero-rating">
               <div className="avatar-stack" aria-hidden="true">
                 {heroReviewerAvatars.map((avatar, index) => (
