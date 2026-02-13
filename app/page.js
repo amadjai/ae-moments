@@ -488,12 +488,6 @@ const founderQuote = {
     "I built our first booth for my own wedding when nothing felt right. It worked so well friends asked us next, and that became AE Moments."
 };
 
-const quoteScrollPhrases = [
-  "Built for weddings, corporate nights, and milestone parties.",
-  "Real camera, real studio lighting, real print quality.",
-  "AE Moments was born from one wedding and scaled through referrals."
-];
-
 const spotlightReview = {
   author: "Fatima Hosain",
   role: "Google Review",
@@ -2200,9 +2194,6 @@ export default function Home() {
           <p className="section-lead package-lead" data-reveal>
             Flexible hire durations and premium bundle options designed for weddings, corporate activations, and private events.
           </p>
-          <div className="bundle-save-tooltip" data-reveal>
-            <span>Save Up to 25%</span>
-          </div>
           <div className="tabs" data-reveal>
             <button
               className={activeTab === "standard" ? "active" : ""}
@@ -2210,12 +2201,24 @@ export default function Home() {
             >
               Standard Rates
             </button>
-            <button
-              className={activeTab === "bundle" ? "active" : ""}
-              onClick={() => setActiveTab("bundle")}
-            >
-              Bundle & Save
-            </button>
+            <div className="bundle-tab-wrap">
+              <span
+                className={`bundle-save-tooltip ${
+                  activeTab === "bundle" ? "is-active" : ""
+                }`}
+                aria-hidden="true"
+              >
+                Save Up to 25%
+              </span>
+              <button
+                className={`bundle-tab-button ${
+                  activeTab === "bundle" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("bundle")}
+              >
+                <span className="bundle-tab-shimmer">Bundle & Save</span>
+              </button>
+            </div>
           </div>
 
           <div className="panel" key={activeTab}>
@@ -2630,13 +2633,6 @@ export default function Home() {
       <section className="section final-cta" id="quote">
         <div className="container" data-reveal>
           <article className="quote-footer-panel">
-            <div className="quote-scroll-wrap" aria-hidden="true">
-              <div className="quote-scroll-track">
-                {[...quoteScrollPhrases, ...quoteScrollPhrases].map((line, index) => (
-                  <p key={`${line}-${index}`}>{line}</p>
-                ))}
-              </div>
-            </div>
             <blockquote className="quote-footer-text">
               “{founderQuote.text}”
             </blockquote>

@@ -6038,66 +6038,105 @@ body {
   object-position: center;
 }
 
-.bundle-save-tooltip {
-  margin-top: 0.8rem;
-  margin-bottom: 0.52rem;
-  min-height: 1.78rem;
-  padding: 0 0.86rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.76);
-  box-shadow: var(--neu-shadow-soft);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.packages .tabs {
+  margin-top: 2.45rem;
 }
 
-.bundle-save-tooltip span {
-  font-size: 0.73rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #101216;
-  background: linear-gradient(110deg, #101216 36%, #666a74 50%, #101216 64%);
-  background-size: 220% 100%;
+.bundle-tab-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.bundle-tab-wrap .bundle-save-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.32rem);
+  transform: translateX(-50%);
+  min-height: auto;
+  padding: 0.45rem 0.72rem;
+  border-radius: 0.72rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: #1f2229;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.26);
+  color: #ffffff;
+  font-size: 0.66rem;
+  font-weight: 640;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.bundle-tab-wrap .bundle-save-tooltip::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid #1f2229;
+}
+
+.bundle-tab-wrap .bundle-save-tooltip.is-active {
+  background: #36a160;
+  border-color: #2f8f54;
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(33, 116, 69, 0.28);
+}
+
+.bundle-tab-wrap .bundle-save-tooltip.is-active::after {
+  border-top-color: #36a160;
+}
+
+.bundle-tab-button .bundle-tab-shimmer {
+  font-size: inherit;
+  font-weight: inherit;
+  color: #111111;
+  background: linear-gradient(110deg, #111111 34%, #686d77 50%, #111111 66%);
+  background-size: 280% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: bundleShimmer 2.2s linear infinite;
+  animation: bundleShimmer 4s linear infinite;
 }
 
-.quote-scroll-wrap {
-  width: 100%;
-  overflow: hidden;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: var(--neu-shadow-soft);
-  margin: 0 auto 1rem;
+.packages .tabs .bundle-tab-button.active,
+.tabs .bundle-tab-button.active {
+  background: #101216;
+  color: #ffffff;
+  border: 1px solid #101216;
+  box-shadow: 0 10px 20px rgba(16, 18, 22, 0.26);
 }
 
-.quote-scroll-track {
-  width: max-content;
-  display: flex;
-  align-items: center;
-  animation: quoteScrollTicker 22s linear infinite;
+.bundle-tab-button.active .bundle-tab-shimmer {
+  color: #ffffff;
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-text-fill-color: #ffffff;
+  animation: none;
 }
 
-.quote-scroll-track p {
-  margin: 0;
-  min-height: 2.25rem;
-  padding: 0 1rem;
-  display: inline-flex;
-  align-items: center;
-  color: #525e73;
-  font-size: 0.8rem;
-  font-weight: 640;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
+.quote-footer-text {
+  opacity: 0;
+  transform: translateY(18px) scale(0.985);
+  filter: blur(5px);
 }
 
-.quote-scroll-track p + p {
-  border-left: 1px solid var(--line);
+.quote-footer-author {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.final-cta .container.is-visible .quote-footer-text {
+  animation: quoteRevealIn 0.95s cubic-bezier(0.2, 0.75, 0.24, 1) 0.08s forwards;
+}
+
+.final-cta .container.is-visible .quote-footer-author {
+  animation: quoteAuthorIn 0.7s ease 0.42s forwards;
 }
 
 .site-footer-credit {
@@ -6123,13 +6162,29 @@ body {
   }
 }
 
-@keyframes quoteScrollTicker {
+@keyframes quoteRevealIn {
   0% {
-    transform: translateX(0);
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+    filter: blur(5px);
   }
 
   100% {
-    transform: translateX(-50%);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes quoteAuthorIn {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -6168,19 +6223,20 @@ body {
     margin-right: calc(50% - 50vw);
   }
 
-  .bundle-save-tooltip {
-    margin-top: 0.7rem;
-    margin-bottom: 0.45rem;
+  .bundle-tab-wrap .bundle-save-tooltip {
+    font-size: 0.58rem;
+    padding: 0.34rem 0.52rem;
+    bottom: calc(100% + 0.26rem);
+    border-radius: 0.56rem;
   }
 
-  .bundle-save-tooltip span {
-    font-size: 0.68rem;
-    letter-spacing: 0.06em;
+  .bundle-tab-wrap .bundle-save-tooltip::after {
+    border-left-width: 5px;
+    border-right-width: 5px;
+    border-top-width: 5px;
   }
 
-  .quote-scroll-track p {
-    font-size: 0.72rem;
-    min-height: 2rem;
-    padding: 0 0.8rem;
+  .packages .tabs {
+    margin-top: 1.9rem;
   }
 }
