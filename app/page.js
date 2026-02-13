@@ -488,6 +488,12 @@ const founderQuote = {
     "I built our first booth for my own wedding when nothing felt right. It worked so well friends asked us next, and that became AE Moments."
 };
 
+const quoteScrollPhrases = [
+  "Built for weddings, corporate nights, and milestone parties.",
+  "Real camera, real studio lighting, real print quality.",
+  "AE Moments was born from one wedding and scaled through referrals."
+];
+
 const spotlightReview = {
   author: "Fatima Hosain",
   role: "Google Review",
@@ -546,12 +552,12 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
   const summaryLine = [
     `${formData.eventType || "Event type not set"}`,
     `${guestCount || "?"} guests`,
-    formData.eventArea || "Area not set",
+    formData.dateNotSure ? "Date not set" : formData.eventDate || "Date not set",
     selectedPathLabel
   ].join(" | ");
 
   return {
-    webhookVersion: "1.0",
+    webhookVersion: "1.1",
     submissionId:
       typeof crypto !== "undefined" && crypto.randomUUID
         ? crypto.randomUUID()
@@ -571,8 +577,7 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
       eventType: formData.eventType || null,
       eventDateStatus: formData.dateNotSure ? "not_sure_yet" : "confirmed_date",
       eventDate: formData.dateNotSure ? null : formData.eventDate || null,
-      guestCount,
-      eventSuburbArea: formData.eventArea || null
+      guestCount
     },
     experiencePath: {
       pathMode: formData.buildPath || null,
@@ -620,7 +625,6 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
       event_date: formData.dateNotSure ? "" : formData.eventDate || "",
       event_date_not_sure: Boolean(formData.dateNotSure),
       guest_count: guestCount || "",
-      suburb_area: formData.eventArea || "",
       build_path: formData.buildPath || "",
       booth_choice: formData.boothChoice || "",
       roaming_printing: formData.roamingPrinting || "",
@@ -765,7 +769,6 @@ const quoteFormInitialState = {
   eventDate: "",
   dateNotSure: false,
   guestCount: "",
-  eventArea: "",
   buildPath: "",
   boothChoice: "",
   roamingPrinting: "",
@@ -1160,7 +1163,6 @@ function QuoteFormModal({ isOpen, onClose }) {
       if (!formData.guestCount || Number(formData.guestCount) <= 0) {
         return "Please enter a valid guest count.";
       }
-      if (!formData.eventArea.trim()) return "Please add your event suburb or area.";
     }
 
     if (step === 2 && !formData.buildPath) {
@@ -1366,17 +1368,6 @@ function QuoteFormModal({ isOpen, onClose }) {
                     value={formData.guestCount}
                     onChange={(event) => setField("guestCount", event.target.value)}
                     placeholder="e.g. 120"
-                    required
-                  />
-                </label>
-
-                <label className="quote-field">
-                  <span>Event suburb / area*</span>
-                  <input
-                    type="text"
-                    value={formData.eventArea}
-                    onChange={(event) => setField("eventArea", event.target.value)}
-                    placeholder="e.g. Parramatta"
                     required
                   />
                 </label>
@@ -1985,7 +1976,11 @@ export default function Home() {
 
           <article className="hero-main" data-reveal>
             <p className="hero-status">
-              <span aria-hidden="true">●</span> Open for Booking
+              <span aria-hidden="true">●</span>
+              <span className="hero-status-desktop">
+                Sydney Customers We&apos;re Available for Booking
+              </span>
+              <span className="hero-status-mobile">Open for Booking</span>
             </p>
             <p className="eyebrow hero-eyebrow">
               Attention Sydney & Greater Sydney Event Hosters Needing A
@@ -2205,6 +2200,9 @@ export default function Home() {
           <p className="section-lead package-lead" data-reveal>
             Flexible hire durations and premium bundle options designed for weddings, corporate activations, and private events.
           </p>
+          <div className="bundle-save-tooltip" data-reveal>
+            <span>Save Up to 25%</span>
+          </div>
           <div className="tabs" data-reveal>
             <button
               className={activeTab === "standard" ? "active" : ""}
@@ -2632,6 +2630,13 @@ export default function Home() {
       <section className="section final-cta" id="quote">
         <div className="container" data-reveal>
           <article className="quote-footer-panel">
+            <div className="quote-scroll-wrap" aria-hidden="true">
+              <div className="quote-scroll-track">
+                {[...quoteScrollPhrases, ...quoteScrollPhrases].map((line, index) => (
+                  <p key={`${line}-${index}`}>{line}</p>
+                ))}
+              </div>
+            </div>
             <blockquote className="quote-footer-text">
               “{founderQuote.text}”
             </blockquote>
@@ -2729,6 +2734,12 @@ export default function Home() {
             </a>
           </nav>
           <p className="site-footer-meta">AE Moments © 2026</p>
+          <p className="site-footer-credit">
+            Made with ❤️ by{" "}
+            <a href="https://originalsmartsite.com" target="_blank" rel="noreferrer">
+              SmartSite
+            </a>
+          </p>
         </div>
       </footer>
     </main>
