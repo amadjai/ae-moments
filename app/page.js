@@ -972,11 +972,19 @@ function LogisticsGraphic({ type }) {
   if (type === "space") {
     return (
       <div className="logistics-graphic space" aria-hidden="true">
-        <div className="space-box">
+        <span className="logi-orb a" />
+        <span className="logi-orb b" />
+        <div className="space-blueprint">
+          <span className="space-line v1" />
+          <span className="space-line v2" />
+          <span className="space-line h1" />
+          <span className="space-line h2" />
+          <span className="space-cam">CAM</span>
+          <span className="space-light">FLASH</span>
+          <span className="space-power">⚡ 1x power</span>
           <span className="space-width">3m</span>
           <span className="space-depth">3m</span>
           <span className="space-height">2.4m</span>
-          <span className="space-power">1x power point</span>
         </div>
       </div>
     );
@@ -985,9 +993,14 @@ function LogisticsGraphic({ type }) {
   if (type === "setup") {
     return (
       <div className="logistics-graphic setup" aria-hidden="true">
-        <span className="setup-dot a" />
-        <span className="setup-dot b" />
-        <span className="setup-dot c" />
+        <div className="setup-track">
+          <span className="setup-line" />
+          <span className="setup-progress" />
+          <span className="setup-dot a">Arrive</span>
+          <span className="setup-dot b">Setup</span>
+          <span className="setup-dot c">Ready</span>
+          <span className="setup-pulse" />
+        </div>
       </div>
     );
   }
@@ -995,15 +1008,23 @@ function LogisticsGraphic({ type }) {
   if (type === "insured") {
     return (
       <div className="logistics-graphic insured" aria-hidden="true">
+        <span className="insured-ring one" />
+        <span className="insured-ring two" />
         <span className="insured-shield">✓</span>
+        <span className="insured-tag">Public liability</span>
       </div>
     );
   }
 
   return (
     <div className="logistics-graphic travel" aria-hidden="true">
-      <span className="travel-route" />
-      <span className="travel-pin">2141</span>
+      <div className="travel-map">
+        <span className="travel-dot start" />
+        <span className="travel-route" />
+        <span className="travel-car">➜</span>
+        <span className="travel-dot end" />
+        <span className="travel-pin">2141 zone</span>
+      </div>
     </div>
   );
 }
@@ -2220,7 +2241,7 @@ export default function Home() {
                 Attention Sydney We Have Limited Availability - Book Now
               </span>
               <span className="hero-status-mobile">
-                Attention Sydney We Have Limited Availability - Book Now
+                Limited Availability - Book Now
               </span>
             </p>
             <p className="eyebrow hero-eyebrow">
@@ -2922,6 +2943,7 @@ export default function Home() {
             <a href="#packages">Packages</a>
             <a href="#compare">Why Us</a>
             <a href="#faq">FAQ</a>
+            <a href="/printdesign">Print Designs</a>
             <a href="#quote" onClick={openQuoteModal}>
               Contact
             </a>
