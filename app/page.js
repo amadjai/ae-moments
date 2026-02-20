@@ -15,22 +15,22 @@ const uspSteps = [
   {
     icon: "◎",
     title: "Canon Mirrorless Camera",
-    detail: "crisp detail + flattering skin tones"
+    detail: "Pin sharp photos and always in focus with eye tracking autofocus"
   },
   {
     icon: "✦",
     title: "Studio Flash Lighting",
-    detail: "consistent results in any venue lighting (even dark receptions)"
+    detail: "Consistent results in any venue lighting for that perfect photo"
   },
   {
     icon: "▣",
-    title: "Dye-Sub Lab Printing",
-    detail: "fast, vibrant, smudge-proof keepsakes"
+    title: "Professional Printer",
+    detail: "Fast printing, vibrant, high quality, smudge-proof keepsakes"
   },
   {
     icon: "◌",
-    title: "Pro Booth Software",
-    detail: "quick flow, reliable printing, zero awkward delays"
+    title: "Professional Photo Booth Software",
+    detail: "Professional software ensuring reliability for every event"
   }
 ];
 
@@ -53,7 +53,7 @@ const audiences = [
   {
     illustration: "dial",
     name: "Weddings",
-    copy: "For couples who want frame-worthy photos and a team that understands wedding timelines—from cocktail hour to dancefloor."
+    copy: "For couples who want frame-worthy photos and a team that understands wedding timelines."
   },
   {
     illustration: "bars",
@@ -63,17 +63,35 @@ const audiences = [
   {
     illustration: "sync",
     name: "Private Parties & Milestones",
-    copy: "Birthdays, engagements, anniversaries, formals—premium fun without cheap-looking prints."
+    copy: "Birthdays, engagements, anniversaries, formals to save those memories."
   }
 ];
 
 const audiencePartnerLogos = [
-  "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698d58b0cfbcd72ed672c84b.png",
-  "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698d58b0bfda3ca0d23bc65d.png",
-  "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698d58b0bfda3c5fbe3bc65c.png",
-  "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698d58b0bfe00f27e6f7f39a.png",
-  "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698d58b07f6dcf306d384dc0.png",
-  "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698d58b0bfe00fd241f7f399.png"
+  {
+    name: "UNSW",
+    src: "/logo/unsw_0.png"
+  },
+  {
+    name: "Commonwealth Bank",
+    src: "/logo/commBank-logo.svg"
+  },
+  {
+    name: "Gelatissimo",
+    src: "/logo/Gelatissimo_Logo_Orange_RGB-e1662101441530.png"
+  },
+  {
+    name: "White Elephant",
+    src: "/logo/WE-Logo-HOZ.webp"
+  },
+  {
+    name: "Moam",
+    src: "/logo/MOAM-Header-Logo-1.png"
+  },
+  {
+    name: "Headstart",
+    src: "/logo/headstart-els.avif"
+  }
 ];
 
 const audienceIllustrationImages = {
@@ -93,7 +111,7 @@ const standardRates = [
     features: [
       "Studio-grade mirrorless photo output",
       "Unlimited sessions during hire",
-      "Instant dye-sub prints available",
+      "Instant high-quality prints available",
       "Online gallery included after event",
       "Friendly on-site attendant included"
     ],
@@ -108,11 +126,10 @@ const standardRates = [
     image:
       "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698c2f27017707587ac557d5.png",
     features: [
-      "Interactive mirror experience guests love",
-      "Unlimited sessions during hire",
-      "Fast high-quality lab prints",
-      "Digital gallery for instant sharing",
-      "Best for high-traffic event moments"
+      "Interactive mirror for the perfect wow factor",
+      "Instant high-quality prints available",
+      "Online gallery provided after event via email",
+      "Luxury look that instantly elevates any event space"
     ],
     pricingLines: ["3hrs $930", "4hrs $1,050", "5hrs $1,170"],
     featured: true,
@@ -139,119 +156,115 @@ const standardRates = [
     name: "Roaming Booth",
     badge: "The booth comes to the guests",
     description:
-      "Photographer-style roaming—perfect for cocktail hour, big venues, and guests who won’t queue.",
+      "Mobile camera/tripod setup that moves around the venue, capturing guests wherever the action is.",
     image:
       "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698c2f2752c952b70bf254ff.png",
     features: [
-      "Photographer-style roaming coverage",
-      "Captures guests who do not queue",
-      "Great for cocktail hour and large venues",
-      "Fast digital delivery flow",
-      "Optional print-enabled roaming setup"
+      "Candid, fun shots with real reactions and energy",
+      "Great for large venues/outdoor spaces",
+      "Ideal for corporate events and brand activations",
+      "Flexible setup with fast event coverage",
+      "Moves around the venue wherever the action is"
     ],
     pricingLines: [
       "Digitals only: 3hrs $1,000 | 4hrs $1,200 | 5hrs $1,400",
       "Digitals + printing: 3hrs $1,150 | 4hrs $1,300 | 5hrs $1,550"
     ],
-    layout: "horizontal",
     outputs: ["Roaming Coverage", "Digitals", "Prints (optional)"]
   }
 ];
 
 const bundles = [
   {
-    name: "Mirror Essentials Bundle",
-    label: "Small Events",
+    name: "Open Air Booth Essentials Bundle",
+    label: "Silver Value",
     tier: "silver",
-    tierCopy: "Starter value bundle",
-    bestFor: "Best for: Small events (max 100 people)",
-    intro:
-      "A premium single-booth setup + the key upgrades people usually add later.",
+    tierLabel: "Silver Value",
+    tierCopy: "Best value starter bundle",
+    plan: "5-hour bundle",
+    bestFor: "Best for up to 350 guests",
+    intro: "",
     includes: [
-      "Mirror Booth (4hrs) — $1,050",
+      "Open Air Booth (5hrs) — $970",
       "Glam Booth (B&W Hollywood) — $110",
       "Guest Book Print Service — $55",
       "Signature Guest Book Set — $135"
     ],
-    trueCost: "$1,350",
-    bundlePrice: "$1,249",
-    savings: "$101",
+    trueCost: "$1,215",
+    bundlePrice: "$1,124",
+    savings: "$91",
     why: [
-      "One feature station = simple + elegant",
-      "Guest book is handled for you",
-      "Glam makes every shot look high-end"
+      "Studio quality output with a clean, simple setup",
+      "Includes premium keepsake upgrades",
+      "Great value for medium to large guest counts"
     ]
   },
   {
     name: "Corporate Brand Experience Bundle",
-    label: "Most Popular",
+    label: "Gold Value",
     tier: "gold",
-    tierCopy: "High-engagement bundle",
+    tierLabel: "Gold Value",
+    tierCopy: "Corporate content bundle",
+    plan: "5-hour bundle",
     featured: true,
-    bestFor:
-      "Best for: Corporate events (activations, EOFY, conferences, brand nights)",
-    intro:
-      "Built for engagement + variety + content volume (without wedding-only production).",
+    bestFor: "Best for corporate events",
+    intro: "",
     includes: [
-      "Mirror Booth (4hrs) — $1,050",
-      "360 Booth (4hrs) — $1,100",
-      "Roaming Booth (4hrs, digitals only) — $1,200",
+      "Open Air Booth (5hrs) — $970",
+      "360 Booth (5hrs) — $1,220",
+      "Glam Booth — $110",
       "Print Upgrade (Postcard 4×6 or Polaroid 3×4) — $165",
-      "Glam Booth — $110"
+      "Commemorative Photo Album — $100"
     ],
-    trueCost: "$3,625",
-    bundlePrice: "$3,190",
-    savings: "$435",
+    trueCost: "$2,565",
+    bundlePrice: "$2,270",
+    savings: "$295",
     why: [
-      "Three experiences = higher participation",
-      "More content (360 clips + roaming moments + prints)",
-      "Shorter lines and better flow",
-      "Better coverage of networking + highlights"
+      "Built for engagement and content variety",
+      "Mix of booth, video, and branded print upgrades",
+      "Great fit for conferences and activations"
     ]
   },
   {
-    name: "Wedding Takeover Ultimate Bundle",
-    label: "Best Value",
+    name: "Platinum Celebration Bundle",
+    label: "Platinum Value",
     tier: "platinum",
-    tierCopy: "Complete wedding takeover",
-    bestFor: "Best for: Large weddings (300+ people)",
-    intro:
-      "The only bundle intentionally built for weddings because it covers every moment: cocktail hour → reception → dancefloor → the cinematic highlight.",
+    tierLabel: "Platinum Value",
+    tierCopy: "Maximum event coverage",
+    plan: "5-hour bundle",
+    bestFor: "Best for 400+ guests",
+    intro: "",
     includes: [
-      "Open Air Booth (4hrs) — $850",
-      "Mirror Booth (4hrs) — $1,050",
-      "360 Booth (4hrs) — $1,100",
-      "Roaming Booth (4hrs, digitals + printing) — $1,300",
-      "Atmospheric Waltz (Dry Ice) — $420",
-      "Luxury Rose Wall — $440",
+      "Open Air Booth (5hrs) — $970",
+      "Mirror Booth (5hrs) — $1,170",
+      "360 Booth (5hrs) — $1,220",
+      "Roaming Booth (5hrs, digitals + printing) — $1,550",
+      "Dry Ice (Dancing on clouds) — $420",
       "Audio Guest Book — $300",
       "Glam Booth — $110",
-      "Guest Book Print Service — $55",
-      "Signature Guest Book Set — $135",
       "Print Upgrade (Polaroid 3×4 or Postcard 4×6) — $165",
       "Commemorative Photo Album — $100"
     ],
-    trueCost: "$6,025",
-    bundlePrice: "$4,990",
-    savings: "$1,035",
+    trueCost: "$4,840",
+    bundlePrice: "$4,114",
+    savings: "$726",
     why: [
-      "Captures the entire night (not just one corner)",
-      "Maximum variety for every guest type",
-      "Faster throughput, fewer queues",
-      "More take-home value (guest book + album + upgraded prints + audio messages)",
-      "The wow moment (dry ice + rose wall = full experience)"
+      "Built for large guest numbers and event scale",
+      "Maximum variety and throughput across the venue",
+      "Premium keepsakes and visual upgrades included"
     ]
   }
 ];
 
 const included = [
-  "Delivery, setup, pack-down, travel (standard zone)",
-  "Dedicated booth host/attendant (full hire)",
-  "Custom-designed print template matched to your theme",
-  "Unlimited sessions + unlimited prints (where printing is included)",
+  "Delivery, setup, pack-down and travel",
+  "Dedicated booth attendant for the full duration of your booking",
+  "Custom tailored prints to match the theme of your event",
+  "Unlimited sessions + 1 print per person (where printing is included)",
   "Private online gallery for high-res downloads",
-  "Props (or go prop-less for a clean editorial look)",
-  "Backdrop included (subject to availability)"
+  "Props included (or go prop-less for a clean editorial look)",
+  "Backdrop included (subject to availability)",
+  "Strict quality check of equipment, camera settings and photos before event starts"
 ];
 
 const bookingAccessDetails = [
@@ -275,6 +288,17 @@ const bookingAccessDetails = [
 
 const upgrades = [
   {
+    id: "print-magnets",
+    name: "Print magnets",
+    category: "Print & Keepsakes",
+    summary:
+      "15x15mm magnets (sheets of 100), ideal for practical keepsakes guests can take home.",
+    price: 22,
+    priceLabel: "$22",
+    photo:
+      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/69980411f83453b98269564f.jpeg"
+  },
+  {
     id: "guest-book-print",
     name: "Guest book print service",
     category: "Print & Keepsakes",
@@ -282,7 +306,7 @@ const upgrades = [
     price: 55,
     priceLabel: "$55",
     photo:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc63a44964ef208aa17c.webp"
+      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/699804113a2afdfe2641a03f.jpg"
   },
   {
     id: "leather-guest-book",
@@ -292,7 +316,7 @@ const upgrades = [
     price: 135,
     priceLabel: "$135",
     photo:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc635ea0712e00d70579.webp"
+      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/69980411df9bdf7b2146893f.jpg"
   },
   {
     id: "photo-album",
@@ -302,7 +326,7 @@ const upgrades = [
     price: 100,
     priceLabel: "$100",
     photo:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc635ea0710545d7057b.jpg"
+      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/69980411df9bdf7e2e46893e.jpg"
   },
   {
     id: "polaroid-3x4",
@@ -322,7 +346,7 @@ const upgrades = [
     price: 165,
     priceLabel: "$165",
     photo:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc63a449644c858aa17b.webp"
+      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/69980411f83453c9e8695653.jpg"
   },
   {
     id: "glam-booth",
@@ -332,7 +356,7 @@ const upgrades = [
     price: 110,
     priceLabel: "$110",
     photo:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc6395bc4a69fff55c3d.webp"
+      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/6998041120c035c29a42093b.jpg"
   },
   {
     id: "luxury-rose-wall",
@@ -429,6 +453,8 @@ const compareRows = [
 
 const googleLogoUrl =
   "https://www.gstatic.com/images/branding/product/2x/gsa_64dp.png";
+const googleReviewsUrl =
+  "https://www.google.com/search?q=aemoments&oq=aemoments#lrd=0x2fb04e6d9c28587f:0x923cf8688c516466,1,,,,";
 
 const socialProofGalleryMedia = [
   "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698d501bbfda3c6df83a6790.jpg",
@@ -450,34 +476,64 @@ const socialProofGalleryMedia = [
 
 const socialProofReviews = [
   {
-    author: "Fatima Hosain",
+    author: "Juliana and David",
     role: "Google Review",
     summary:
-      "Praised Andrew and the team for smooth setup and standout photo booth quality with the dry-ice dance effect."
+      "AE Moments was one of the best decisions we made for our wedding! Andrew and his team were so organised, fun and professional throughout the night. The photo booth was a huge hit with all of the guests and the quality of the prints was amazing. Highly recommend!"
   },
   {
-    author: "Ezra Garrett",
+    author: "Janet Chan",
     role: "Google Review",
     summary:
-      "Said the team was professional and easy to work with, and highly recommended AE Moments for event quality."
+      "AE Moments provided exceptional service for our wedding. The quality of the prints is really good and we got the flexibility to keep the photo booth running during cocktail hour which made the guests really happy. Highly recommend for any event!"
   },
   {
-    author: "Adrian Aidasani",
+    author: "Kim",
     role: "Google Review",
     summary:
-      "Called out high-quality photos and top-tier service, noting the booth looked premium and polished on-site."
+      "Andrew and the team at AE Moments were wonderful vendors for our wedding reception and photo booth hire! Friendly and professional, which is so valuable when planning a wedding. The entire process including set up was seamless."
   },
   {
-    author: "Christian Husni",
+    author: "Daniel Guo",
     role: "Google Review",
     summary:
-      "Mentioned the setup looked elegant, photos came out amazing, and communication stayed clear throughout."
+      "We hired AE Moments for our wedding and couldn't be happier with the service! From start to finish, the team was fantastic - they worked closely with us to personalise the photo templates, making it feel really special and unique to us."
   },
   {
-    author: "Ricky Mulia",
+    author: "Johnny Huang Nguyen",
     role: "Google Review",
     summary:
-      "Shared that the team was reliable and professional, helping keep the event flow clean and stress-free."
+      "I had the pleasure of working alongside AE Moments at a wedding as the photographer. Overall, the setup was visually aesthetic. Guests were very fun with the props and booth!"
+  },
+  {
+    author: "Ethan Kaces",
+    role: "Google Review",
+    summary:
+      "Andrew & his team were amazing to work with! We hired a Photo Booth for several year presentations for our work and their service was outstanding. From the first point of contact till the event, they were 10/10 in all aspects. Highly recommend!"
+  },
+  {
+    author: "Jocelyn",
+    role: "Google Review",
+    summary:
+      "AE Moments were amazing! Andrew was very helpful throughout the whole process, and went above and beyond to assist us and ensure that everything was perfect on the day. Highly recommend for your next function!"
+  },
+  {
+    author: "Samantha Wallace",
+    role: "Google Review",
+    summary:
+      "I booked AE Moments Photo Booth for my wedding in November 2023 and it was amazing! The team were incredible and professional since the setup to pack down. They provided fun downloads (singles, strips and GIFs) I love them!"
+  },
+  {
+    author: "Austin So",
+    role: "Google Review",
+    summary:
+      "We hired AE Moments for our wedding and couldn't be happier! Guests loved it, prints are high quality and the team were friendly and accommodating. Everything ran smoothly from start to finish."
+  },
+  {
+    author: "Daniela Gonzalez",
+    role: "Google Review",
+    summary:
+      "Andrew was amazingly responsive and helpful from the very first contact. The AE Moments team delivered top-notch service and high quality booth for our function. Thank you Andrew & team."
   }
 ];
 
@@ -485,40 +541,37 @@ const founderQuote = {
   author: "Andrew Chung",
   role: "Founder of AE Moments",
   text:
-    "I built our first booth for my own wedding when nothing felt right. It worked so well friends asked us next, and that became AE Moments."
-};
-
-const spotlightReview = {
-  author: "Fatima Hosain",
-  role: "Google Review",
-  quote:
-    "Hired Andrew for the photobooth and fog machine at our wedding. The setup looked beautiful and the photos turned out amazing."
+    "Born from a search for perfection, AE Moments started with a custom-built photo booth for my own wedding. What began as a personal quest to 'get it right' quickly evolved into a full scale business after friends and family fell in love with the experience."
 };
 
 const logistics = [
   {
     title: "Space & Power",
     detail:
-      "Allow approx 3m (W) × 3m (D) × 2.7m (H) with one nearby power point.",
-    icon: "⌂"
+      "Allow approx 3m (W) × 3m (D) × 2.4m (H) with one nearby power point.",
+    icon: "⌂",
+    graphic: "space"
   },
   {
     title: "Seamless Setup",
     detail:
       "Setup and pack-down are included. We arrive early so guests only see the polished final setup.",
-    icon: "◔"
+    icon: "◔",
+    graphic: "setup"
   },
   {
     title: "Fully Insured",
     detail:
       "AE Moments operates with public liability insurance for venue compliance and peace of mind.",
-    icon: "✓"
+    icon: "✓",
+    graphic: "insured"
   },
   {
     title: "Travel Clarity",
     detail:
-      "Standard pricing includes travel within 30 minutes of Lidcombe (Angel Storage). Beyond that, travel is pro-rata at $70/hr + parking. Minimum hires may apply.",
-    icon: "↗"
+      "Standard pricing includes travel within 30 minutes of areas surrounding 2141. Travel is pro-rata at $70/hr + parking outside of these areas.",
+    icon: "↗",
+    graphic: "travel"
   }
 ];
 
@@ -527,7 +580,7 @@ const siteLogoUrl =
 const instagramUrl = "https://www.instagram.com/aemoments.au";
 const facebookUrl = "https://www.facebook.com/aemoments.au";
 const contactEmail = "admin@aemoments.com.au";
-const contactPhone = "+61 452 195 855";
+const contactPhone = "0452 195 855";
 const contactPhoneHref = "tel:+61452195855";
 const quoteWebhookUrl =
   "https://services.leadconnectorhq.com/hooks/KbLyUwHy2FrboitSpuPl/webhook-trigger/0f7be69b-cbc2-41a4-bb9f-b384ba8ae0d7";
@@ -593,7 +646,8 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
     },
     timingVenue: {
       hireDuration: formData.hireDuration || null,
-      preferredBoothRunTime: formData.runTime || null,
+      eventStartTime: formData.eventStartTime || null,
+      eventFinishTime: formData.eventFinishTime || null,
       venueName: formData.venueName || null,
       venueSuburbAddress: formData.venueAddress || null,
       ceremonyAndReceptionSameVenue: isWedding ? formData.sameVenue || null : null
@@ -626,7 +680,8 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
       quick_upgrades: quickUpgrades.join(" | "),
       quick_upgrades_count: quickUpgrades.length,
       hire_duration: formData.hireDuration || "",
-      preferred_run_time: formData.runTime || "",
+      event_start_time: formData.eventStartTime || "",
+      event_finish_time: formData.eventFinishTime || "",
       venue_name: formData.venueName || "",
       venue_address: formData.venueAddress || "",
       wedding_same_venue: formData.sameVenue || "",
@@ -645,17 +700,17 @@ const faqs = [
     question:
       "What makes AE Moments different from a “normal” photo booth?",
     answer:
-      "AE Moments runs a StudioBooth system: mirrorless camera, controlled studio flash, pro booth software, and dye-sub printing. This combination creates sharper photos, better skin tones, and consistent results regardless of venue lighting."
+      "We offer three premium booth experiences: Open Air Booth for studio-quality photos, Mirror Booth for interactive wow-factor moments, and Roaming Booth for candid, on-the-move coverage. Each setup is quality-controlled for consistent output."
   },
   {
     question: "What’s included in the price?",
     answer:
-      "Every booking includes setup/pack-down, attendant, custom print template, unlimited sessions, unlimited prints where printing is selected, and a private online gallery. Standard travel zone is included."
+      "Every booking includes setup/pack-down, a dedicated attendant, custom tailored print design, unlimited sessions, and a private online gallery. Printing inclusions depend on your selected package."
   },
   {
     question: "How much space do you need and what do we need to provide?",
     answer:
-      "Plan for around 3m by 3m with 2.7m ceiling height and one power point. We bring the booth system, lighting, and operational setup."
+      "Open Air Booth and Mirror Booth need around 3m x 3m, 2.4m ceiling height, and one power point. 360 Booth needs around 4m x 4m and one power point."
   },
   {
     question:
@@ -671,18 +726,23 @@ const faqs = [
   {
     question: "Can you match our wedding theme / branding?",
     answer:
-      "Yes. Print templates are custom-designed for your event style or brand look so your output feels cohesive."
+      "Yes. We provide custom tailored prints to match your wedding theme or brand style so all take-home outputs look cohesive."
   },
   {
     question:
       "Do you travel outside Sydney, and how does travel pricing work?",
     answer:
-      "Travel inside the standard zone is included. Beyond that, travel is charged pro-rata at $70/hr plus parking when applicable."
+      "Standard pricing includes travel within 30 minutes of areas surrounding 2141. Travel is pro-rata at $70/hr plus parking outside of these areas."
   },
   {
     question: "Which booth should I choose for my event?",
     answer:
       "Share your guest count, venue details, and vibe. AE Moments will recommend the best mix for flow, throughput, and the look you want."
+  },
+  {
+    question: "What aspects of the photos do you quality control?",
+    answer:
+      "Before guests begin, we run test prints, calibrate lighting, confirm framing symmetry, and check camera settings for consistent exposure and focus. During the event, we monitor output quality in real time and adjust lighting/positioning as needed."
   }
 ];
 
@@ -734,6 +794,7 @@ const tickerSlots = ["slot-top", "slot-center", "slot-bottom"];
 
 const quoteEventTypes = [
   "Wedding",
+  "Engagement",
   "Birthday",
   "Corporate events",
   "Product activation",
@@ -769,7 +830,8 @@ const quoteFormInitialState = {
   quickUpgrades: [],
   bundleChoice: "",
   hireDuration: "",
-  runTime: "",
+  eventStartTime: "",
+  eventFinishTime: "",
   venueName: "",
   venueAddress: "",
   sameVenue: "",
@@ -825,7 +887,7 @@ function StandardCard({ item, onCtaClick }) {
         ))}
       </div>
       <div className="package-price-block">
-        <p className="package-price-label">Rates</p>
+        <p className="package-price-label">Standard rates from</p>
         <div className="package-price-lines">
           {item.pricingLines.map((line) => (
             <p key={line}>{line}</p>
@@ -854,6 +916,55 @@ function UspPointCard({ step, number }) {
   );
 }
 
+function SectionPill({ label, centered = false }) {
+  return (
+    <p className={`section-pill ${centered ? "centered" : ""}`} data-reveal>
+      <span aria-hidden="true">✱</span>
+      <span>{label}</span>
+    </p>
+  );
+}
+
+function LogisticsGraphic({ type }) {
+  if (type === "space") {
+    return (
+      <div className="logistics-graphic space" aria-hidden="true">
+        <div className="space-box">
+          <span className="space-width">3m</span>
+          <span className="space-depth">3m</span>
+          <span className="space-height">2.4m</span>
+          <span className="space-power">1x power point</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === "setup") {
+    return (
+      <div className="logistics-graphic setup" aria-hidden="true">
+        <span className="setup-dot a" />
+        <span className="setup-dot b" />
+        <span className="setup-dot c" />
+      </div>
+    );
+  }
+
+  if (type === "insured") {
+    return (
+      <div className="logistics-graphic insured" aria-hidden="true">
+        <span className="insured-shield">✓</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="logistics-graphic travel" aria-hidden="true">
+      <span className="travel-route" />
+      <span className="travel-pin">2141</span>
+    </div>
+  );
+}
+
 function AudienceIllustration({ type, label }) {
   return (
     <img
@@ -873,7 +984,7 @@ function BundleCard({ item, onCtaClick }) {
       data-reveal
     >
       <div className={`bundle-tier-card ${item.tier}`}>
-        <p className="bundle-tier-name">{item.tier} value</p>
+        <p className="bundle-tier-name">{item.tierLabel}</p>
         <img
           className="bundle-tier-logo"
           src={siteLogoUrl}
@@ -885,12 +996,12 @@ function BundleCard({ item, onCtaClick }) {
         <p className="bundle-tier-save">Save {item.savings}</p>
       </div>
       <div className="bundle-top">
-        <p className="bundle-plan">4-hour bundle</p>
+        <p className="bundle-plan">{item.plan}</p>
         <p className="bundle-pill">{item.label}</p>
       </div>
       <h3>{item.name}</h3>
       <p className="meta">{item.bestFor}</p>
-      <p>{item.intro}</p>
+      {item.intro ? <p>{item.intro}</p> : null}
       <div className="bundle-pricing">
         <p className="bundle-price-row bundle-price-old">
           <span>True cost</span> <s>{item.trueCost}</s>
@@ -950,34 +1061,21 @@ function SocialProofSection() {
   return (
     <section className="section social-proof-v2" id="reviews">
       <div className="container social-proof-shell">
+        <SectionPill label="Proof" centered />
         <div className="social-proof-top">
           <article className="sp-panel sp-intro" data-reveal>
             <p className="sp-kicker">What our clients say</p>
             <h2>Proof your event is in expert hands.</h2>
-            <p className="sp-intro-copy">
-              From wedding timelines to high-volume activations, clients trust
-              AE Moments to deliver clear communication, premium output, and a
-              smooth guest experience.
-            </p>
             <p className="sp-note">
-              Real feedback sourced from public Google Reviews for AE Moments.
+              Real feedback from public Google Reviews for AE Moments:{" "}
+              <a href={googleReviewsUrl} target="_blank" rel="noreferrer">
+                Read what our clients have to say
+              </a>
             </p>
-          </article>
-
-          <article className="sp-panel sp-spotlight" data-reveal>
-            <p className="sp-spotlight-title">Spotlight</p>
-            <blockquote className="sp-quote">“{spotlightReview.quote}”</blockquote>
-            <div className="sp-person">
-              <span className="sp-avatar" aria-hidden="true">
-                {spotlightReview.author
-                  .split(" ")
-                  .map((part) => part[0])
-                  .join("")
-                  .slice(0, 2)}
-              </span>
-              <p className="sp-person-name">{spotlightReview.author}</p>
-              <p className="sp-person-role">{spotlightReview.role}</p>
-            </div>
+            <p className="sp-note-secondary">
+              Want every new review auto-shown here? We can wire this to a live
+              Google Places feed.
+            </p>
           </article>
         </div>
 
@@ -1025,6 +1123,75 @@ function SocialProofSection() {
             </article>
           ))}
         </div>
+        <div className="sp-social-follow" data-reveal>
+          <p>Check us on out our socials.</p>
+          <div className="sp-social-follow-links">
+            <a href={instagramUrl} target="_blank" rel="noreferrer" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5a4.25 4.25 0 0 0 4.25-4.25v-8.5a4.25 4.25 0 0 0-4.25-4.25h-8.5Zm8.9 2.2a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 1.5a3.5 3.5 0 1 0 0 7.001A3.5 3.5 0 0 0 12 8.5Z" />
+              </svg>
+              <span>Instagram</span>
+            </a>
+            <a href={facebookUrl} target="_blank" rel="noreferrer" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M13.5 22v-8h2.8l.42-3.25H13.5V8.67c0-.94.27-1.58 1.62-1.58h1.73V4.2a21.5 21.5 0 0 0-2.52-.13c-2.5 0-4.2 1.52-4.2 4.33v2.35H7.3V14h2.83v8h3.37Z" />
+              </svg>
+              <span>Facebook</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CompareSection() {
+  return (
+    <section className="section compare" id="compare">
+      <div className="container">
+        <SectionPill label="Why Us" />
+        <h2 data-reveal>Why Choose AE Moments</h2>
+        <p className="section-lead compare-lead" data-reveal>
+          A side-by-side view of what you actually get when quality,
+          reliability, and guest experience matter.
+        </p>
+        <div className="compare-shell" data-reveal>
+          <div className="compare-scroll" role="region" aria-label="Comparison table">
+            <div className="compare-matrix">
+              <div className="compare-matrix-head">
+                <p className="compare-feature-head">What matters most</p>
+                <div className="compare-col-head compare-col-head-ae">
+                  <span className="compare-ae-chip" aria-hidden="true">
+                    AE
+                  </span>
+                  <p>AE Moments</p>
+                </div>
+                <div className="compare-col-head">
+                  <p>Typical Booth</p>
+                </div>
+              </div>
+              {compareRows.map((row) => (
+                <div key={row.label} className="compare-matrix-row">
+                  <div className="compare-feature-cell">
+                    <p>{row.label}</p>
+                  </div>
+                  <div className="compare-value-cell compare-value-ae">
+                    <span className="compare-status check" aria-hidden="true">
+                      ✓
+                    </span>
+                    <p>{row.ae}</p>
+                  </div>
+                  <div className="compare-value-cell">
+                    <span className="compare-status cross" aria-hidden="true">
+                      ×
+                    </span>
+                    <p>{row.typical}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -1049,8 +1216,8 @@ function QuoteFormModal({ isOpen, onClose }) {
 
     if (formData.eventType === "Wedding") {
       return [
-        "Mirror Essentials Bundle",
-        "Wedding Takeover Ultimate Bundle",
+        "Open Air Booth Essentials Bundle",
+        "Platinum Celebration Bundle",
         "Corporate Brand Experience Bundle",
         recommend
       ];
@@ -1062,16 +1229,16 @@ function QuoteFormModal({ isOpen, onClose }) {
     ) {
       return [
         "Corporate Brand Experience Bundle",
-        "Mirror Essentials Bundle",
-        "Wedding Takeover Ultimate Bundle",
+        "Open Air Booth Essentials Bundle",
+        "Platinum Celebration Bundle",
         recommend
       ];
     }
 
     return [
-      "Mirror Essentials Bundle",
+      "Open Air Booth Essentials Bundle",
       "Corporate Brand Experience Bundle",
-      "Wedding Takeover Ultimate Bundle",
+      "Platinum Celebration Bundle",
       recommend
     ];
   }, [formData.eventType]);
@@ -1178,7 +1345,11 @@ function QuoteFormModal({ isOpen, onClose }) {
 
     if (step === 4) {
       if (!formData.hireDuration) return "Please select the hire duration.";
-      if (!formData.runTime) return "Please choose a preferred booth run time.";
+      if (isWedding && formData.hireDuration === "3 hours") {
+        return "For weddings, minimum booking is 4 hours.";
+      }
+      if (!formData.eventStartTime) return "Please choose an event start time.";
+      if (!formData.eventFinishTime) return "Please choose an event finish time.";
       if (!formData.venueAddress.trim()) return "Please add venue suburb or address.";
     }
 
@@ -1527,41 +1698,71 @@ function QuoteFormModal({ isOpen, onClose }) {
 
                 <fieldset className="quote-fieldset">
                   <legend>Hire duration*</legend>
+                  <p className="quote-helper">
+                    For weddings, the booth must be set up before guests arrive
+                    and packed down after formalities to avoid disruption. For
+                    this reason, we require a minimum 4 hour booking.
+                  </p>
                   <div className="quote-inline-options">
-                    {["3 hours", "4 hours", "5 hours"].map((option) => (
-                      <label
-                        key={option}
-                        className={`quote-chip-option ${
-                          formData.hireDuration === option ? "is-active" : ""
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="hireDuration"
-                          value={option}
-                          checked={formData.hireDuration === option}
-                          onChange={(event) => setField("hireDuration", event.target.value)}
-                        />
-                        <span>{option}</span>
-                      </label>
-                    ))}
+                    {["3 hours", "4 hours", "5 hours", "6 hours or more"].map(
+                      (option) => (
+                        <label
+                          key={option}
+                          className={`quote-chip-option ${
+                            formData.hireDuration === option ? "is-active" : ""
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="hireDuration"
+                            value={option}
+                            checked={formData.hireDuration === option}
+                            onChange={(event) => setField("hireDuration", event.target.value)}
+                          />
+                          <span>{option}</span>
+                        </label>
+                      )
+                    )}
                   </div>
                 </fieldset>
 
                 <label className="quote-field">
-                  <span>Preferred booth run time*</span>
+                  <span>Event Start Time*</span>
                   <select
-                    value={formData.runTime}
-                    onChange={(event) => setField("runTime", event.target.value)}
+                    value={formData.eventStartTime}
+                    onChange={(event) => setField("eventStartTime", event.target.value)}
                     required
                   >
-                    <option value="">Select preferred timing</option>
-                    <option value="Cocktail hour">Cocktail hour</option>
-                    <option value="After dinner">After dinner</option>
-                    <option value="During dancefloor">During dancefloor</option>
-                    <option value="Not sure (recommend for me)">
-                      Not sure (recommend for me)
+                    <option value="">Select event start time</option>
+                    <option value="Morning (8:00am - 11:59am)">
+                      Morning (8:00am - 11:59am)
                     </option>
+                    <option value="Midday (12:00pm - 2:59pm)">
+                      Midday (12:00pm - 2:59pm)
+                    </option>
+                    <option value="Afternoon (3:00pm - 5:59pm)">
+                      Afternoon (3:00pm - 5:59pm)
+                    </option>
+                    <option value="Evening (6:00pm - 8:59pm)">
+                      Evening (6:00pm - 8:59pm)
+                    </option>
+                    <option value="Night (9:00pm onwards)">Night (9:00pm onwards)</option>
+                  </select>
+                </label>
+
+                <label className="quote-field">
+                  <span>Event Finish Time*</span>
+                  <select
+                    value={formData.eventFinishTime}
+                    onChange={(event) => setField("eventFinishTime", event.target.value)}
+                    required
+                  >
+                    <option value="">Select event finish time</option>
+                    <option value="Before 4:00pm">Before 4:00pm</option>
+                    <option value="4:00pm - 7:00pm">4:00pm - 7:00pm</option>
+                    <option value="7:00pm - 10:00pm">7:00pm - 10:00pm</option>
+                    <option value="10:00pm - Midnight">10:00pm - Midnight</option>
+                    <option value="After Midnight">After Midnight</option>
                   </select>
                 </label>
 
@@ -1885,7 +2086,7 @@ export default function Home() {
       setRightVisible((current) =>
         rotateDown(current, heroTestimonialsRight.length)
       );
-    }, 1500);
+    }, 2600);
 
     return () => window.clearInterval(intervalId);
   }, []);
@@ -1923,6 +2124,7 @@ export default function Home() {
         </a>
         <nav className="nav-center">
           <a href="#top">Home</a>
+          <a href="#studiobooth">StudioBooth System</a>
           <a href="#packages">Packages</a>
           <a href="#compare">Why Us</a>
           <a href="#faq">FAQ</a>
@@ -1972,19 +2174,20 @@ export default function Home() {
             <p className="hero-status">
               <span aria-hidden="true">●</span>
               <span className="hero-status-desktop">
-                Sydney Customers We&apos;re Available for Booking
+                Attention Sydney We Have Limited Availability - Book Now
               </span>
-              <span className="hero-status-mobile">Open for Booking</span>
+              <span className="hero-status-mobile">
+                Attention Sydney We Have Limited Availability - Book Now
+              </span>
             </p>
             <p className="eyebrow hero-eyebrow">
               Attention Sydney & Greater Sydney Event Hosters Needing A
               Photobooth
             </p>
-            <h1>Get A Studio-Quality Photo Booth For Your Next Event</h1>
+            <h1>Studio Quality Photo Booth For Your Special Event</h1>
             <p className="lead hero-lead">
-              An advanced, studio-grade photo booth system, engineered for
-              unlimited, frame-worthy photos. Real camera, real lighting, real
-              prints.
+              Sydney&apos;s best studio grade photo booth. Real camera, real
+              lighting real prints
             </p>
             <img
               className="hero-mobile-photo"
@@ -2030,7 +2233,11 @@ export default function Home() {
               </div>
               <div>
                 <p className="star-line">★★★★★</p>
-                <p>112 Google Reviews</p>
+                <p>
+                  <a href={googleReviewsUrl} target="_blank" rel="noreferrer">
+                    5 star Google reviews
+                  </a>
+                </p>
               </div>
             </div>
             <div className="proof-strip hero-proof">
@@ -2046,16 +2253,18 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section usp">
+      <section className="section usp" id="studiobooth">
         <div className="container usp-shell">
           <p className="eyebrow" data-reveal>
-            Why AE Moments looks different
+            WHAT WE OFFER
           </p>
-          <h2 data-reveal>The StudioBooth System</h2>
+          <h2 data-reveal>Our Open Air Booth</h2>
           <p className="section-lead usp-lead" data-reveal>
-            Most booths rely on tablet cameras and venue lighting. We don’t.
-            StudioBooth System: mirrorless camera + studio flash + pro lab
-            prints, so every guest can access photos of the highest quality.
+            Most photo booths rely on using a tablet camera and venue lighting.
+            We don&apos;t. Our Open Air Booth uses Canon&apos;s latest mirrorless
+            camera model + studio flash + high-quality photo paper &
+            professional printer, so you and your guest take home quality studio
+            grade photos
           </p>
 
           <div className="usp-stage">
@@ -2128,23 +2337,22 @@ export default function Home() {
             </div>
           </div>
 
-          <p className="result-copy" data-reveal>
-            Result: photos you’d actually frame… and prints guests fight over.
-          </p>
         </div>
       </section>
+
+      <CompareSection />
 
       <section className="section audience">
         <div className="container audience-shell">
           <div className="audience-head" data-reveal>
-            <p className="audience-kicker">Built for</p>
-            <h2>Who We Serve</h2>
+            <SectionPill label="Built For" />
+            <h2>Book us for</h2>
             <p className="section-lead audience-lead">
-              Built for events that care about how the photos actually look.
-              Whether you’re hosting an intimate celebration or a 300+ guest
-              wedding, AE Moments is for people who don’t want “just a photo
-              booth”—they want studio-quality memories and a smooth experience
-              guests rave about.
+              Whether you&apos;re hosting an intimate celebration or a large
+              event, AE Moments is for people who don&apos;t want just a photo
+              booth. We offer studio quality images, a seamless setup and strict
+              quality control, resulting in the best forever keepsakes for you
+              and your guests.
             </p>
           </div>
           <div className="audience-grid">
@@ -2163,11 +2371,11 @@ export default function Home() {
               Other venues & brands we&apos;ve worked with:
             </p>
             <div className="audience-logo-grid">
-              {audiencePartnerLogos.map((logo, index) => (
-                <figure key={logo} className="audience-logo-item">
+              {audiencePartnerLogos.map((logo) => (
+                <figure key={logo.src} className="audience-logo-item">
                   <img
-                    src={logo}
-                    alt={`Venue and brand partner logo ${index + 1}`}
+                    src={logo.src}
+                    alt={`${logo.name} partner logo`}
                     loading="lazy"
                     decoding="async"
                   />
@@ -2175,10 +2383,6 @@ export default function Home() {
               ))}
             </div>
           </div>
-          <p className="recommend-note" data-reveal>
-            Not sure what you need? Tell us your guest count + vibe and we’ll
-            recommend the best setup for your space and timeline.
-          </p>
         </div>
       </section>
 
@@ -2187,9 +2391,7 @@ export default function Home() {
       <section className="section packages" id="packages">
         <div className="container">
           <span className="packages-glow" aria-hidden="true" data-reveal />
-          <p className="eyebrow" data-reveal>
-            Our Photo Booth Packages
-          </p>
+          <SectionPill label="Packages" />
           <h2 data-reveal>Studio-quality booths. Seamless setup. Unforgettable guest experience.</h2>
           <p className="section-lead package-lead" data-reveal>
             Flexible hire durations and premium bundle options designed for weddings, corporate activations, and private events.
@@ -2208,7 +2410,7 @@ export default function Home() {
                 }`}
                 aria-hidden="true"
               >
-                Save Up to 25%
+                Save Up to 15%
               </span>
               <button
                 className={`bundle-tab-button ${
@@ -2216,7 +2418,9 @@ export default function Home() {
                 }`}
                 onClick={() => setActiveTab("bundle")}
               >
-                <span className="bundle-tab-shimmer">Bundle & Save</span>
+                <span className="bundle-tab-shimmer">
+                  Bundle & Save (Save Up to 15%)
+                </span>
               </button>
             </div>
           </div>
@@ -2244,19 +2448,13 @@ export default function Home() {
               </div>
             )}
           </div>
-          {activeTab === "bundle" && (
-            <p className="tab-note" data-reveal>
-              Bundle & Save tab shows curated 4-hour packages with true savings
-              displayed.
-            </p>
-          )}
         </div>
       </section>
 
       <section className="section included">
         <div className="container included-layout">
           <article data-reveal>
-            <p className="eyebrow">The AE Moments Standard (included)</p>
+            <SectionPill label="Included" />
             <h2>What’s Included in Every Booking</h2>
             <ul className="line-list">
               {included.map((item) => (
@@ -2331,7 +2529,7 @@ export default function Home() {
       <section className="section upgrades">
         <div className="container upgrades-order-shell">
           <div className="upgrades-order-head" data-reveal>
-            <p className="eyebrow">Event Enhancements & Upgrades</p>
+            <SectionPill label="Upgrades" />
             <h2>Build your event extras like a curated menu</h2>
             <p className="section-lead">
               Check upgrades to build your shortlist. Each selected add-on drops
@@ -2526,60 +2724,10 @@ export default function Home() {
         </span>
       </a>
 
-      <section className="section compare" id="compare">
-        <div className="container">
-          <p className="eyebrow" data-reveal>
-            How Do We Compare
-          </p>
-          <h2 data-reveal>Why Choose AE Moments</h2>
-          <p className="section-lead compare-lead" data-reveal>
-            A side-by-side view of what you actually get when quality,
-            reliability, and guest experience matter.
-          </p>
-          <div className="compare-shell" data-reveal>
-            <div className="compare-scroll" role="region" aria-label="Comparison table">
-              <div className="compare-matrix">
-                <div className="compare-matrix-head">
-                  <p className="compare-feature-head">What matters most</p>
-                  <div className="compare-col-head compare-col-head-ae">
-                    <span className="compare-ae-chip" aria-hidden="true">
-                      AE
-                    </span>
-                    <p>AE Moments</p>
-                  </div>
-                  <div className="compare-col-head">
-                    <p>Typical Booth</p>
-                  </div>
-                </div>
-                {compareRows.map((row) => (
-                  <div key={row.label} className="compare-matrix-row">
-                    <div className="compare-feature-cell">
-                      <p>{row.label}</p>
-                    </div>
-                    <div className="compare-value-cell compare-value-ae">
-                      <span className="compare-status check" aria-hidden="true">
-                        ✓
-                      </span>
-                      <p>{row.ae}</p>
-                    </div>
-                    <div className="compare-value-cell">
-                      <span className="compare-status cross" aria-hidden="true">
-                        ×
-                      </span>
-                      <p>{row.typical}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="section logistics">
         <div className="container logistics-layout">
           <article className="logistics-intro card" data-reveal>
-            <p className="eyebrow">Logistics (so you can stop thinking about it)</p>
+            <SectionPill label="Logistics" />
             <h2>Everything handled before guests arrive</h2>
             <p>
               The team coordinates setup, operation, and pack-down so your event
@@ -2603,6 +2751,7 @@ export default function Home() {
                   </span>
                 </div>
                 <h3>{item.title}</h3>
+                <LogisticsGraphic type={item.graphic} />
                 <p>{item.detail}</p>
               </article>
             ))}
@@ -2612,9 +2761,7 @@ export default function Home() {
 
       <section className="section faq" id="faq">
         <div className="container">
-          <p className="eyebrow" data-reveal>
-            FAQ
-          </p>
+          <SectionPill label="FAQ" />
           <h2 data-reveal>Answers before you book</h2>
           <div className="faq-list">
             {faqs.map((item, index) => (
@@ -2722,6 +2869,7 @@ export default function Home() {
             </a>
           </div>
           <nav className="site-footer-links">
+            <a href="#studiobooth">StudioBooth System</a>
             <a href="#packages">Packages</a>
             <a href="#compare">Why Us</a>
             <a href="#faq">FAQ</a>
