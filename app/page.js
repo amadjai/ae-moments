@@ -91,8 +91,51 @@ const audiencePartnerLogos = [
   {
     name: "Headstart",
     src: "/logo/headstart-els.avif"
+  },
+  {
+    name: "Caltex House",
+    src: "/logo/621cd52c20e6c6635cc8d924_Logo.svg"
+  },
+  {
+    name: "CFD",
+    src: "/logo/CFD_Full+no+bg.webp"
+  },
+  {
+    name: "AE Moments Mark",
+    src: "/logo/NEW-LOGO-v6-outline-2.png"
+  },
+  {
+    name: "JNJG",
+    src: "/logo/jnjg_001-white.png"
+  },
+  {
+    name: "Brand Mark",
+    src: "/logo/logo-sticky-1.png"
+  },
+  {
+    name: "Brand Monogram",
+    src: "/logo/logo.svg"
+  },
+  {
+    name: "Logo 22",
+    src: "/logo/logo22.jpg"
+  },
+  {
+    name: "SI",
+    src: "/logo/si_logo_L.avif"
+  },
+  {
+    name: "Wannian",
+    src: "/logo/wannian_logo_web5.avif"
   }
 ];
+
+const audiencePartnerRowA = audiencePartnerLogos.filter(
+  (_, index) => index % 2 === 0
+);
+const audiencePartnerRowB = audiencePartnerLogos.filter(
+  (_, index) => index % 2 === 1
+);
 
 const audienceIllustrationImages = {
   dial: "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698c2e6ca41b87e4da8fb24c.png",
@@ -2370,17 +2413,35 @@ export default function Home() {
             <p className="audience-partners-label">
               Other venues & brands we&apos;ve worked with:
             </p>
-            <div className="audience-logo-grid">
-              {audiencePartnerLogos.map((logo) => (
-                <figure key={logo.src} className="audience-logo-item">
-                  <img
-                    src={logo.src}
-                    alt={`${logo.name} partner logo`}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </figure>
-              ))}
+            <div className="audience-logo-ticker">
+              <div className="audience-logo-marquee">
+                <div className="audience-logo-track">
+                  {[...audiencePartnerRowA, ...audiencePartnerRowA].map((logo, index) => (
+                    <img
+                      key={`${logo.src}-a-${index}`}
+                      className="audience-logo-inline"
+                      src={logo.src}
+                      alt={`${logo.name} partner logo`}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="audience-logo-marquee audience-logo-marquee-reverse">
+                <div className="audience-logo-track audience-logo-track-reverse">
+                  {[...audiencePartnerRowB, ...audiencePartnerRowB].map((logo, index) => (
+                    <img
+                      key={`${logo.src}-b-${index}`}
+                      className="audience-logo-inline"
+                      src={logo.src}
+                      alt={`${logo.name} partner logo`}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2812,18 +2873,6 @@ export default function Home() {
           preload="auto"
           aria-hidden="true"
           src="https://framerusercontent.com/assets/aMPvRVYHFQxBoB0v2qyJln83jI.mp4"
-          style={{
-            cursor: "auto",
-            width: "100%",
-            height: "100%",
-            borderRadius: "0px",
-            display: "block",
-            objectFit: "cover",
-            backgroundColor: "rgba(204, 8, 8, 0)",
-            objectPosition: "50% 50%",
-            filter: "brightness(0.66) grayscale(1) invert(0.92)",
-            opacity: 0.96
-          }}
         />
         <div className="site-footer-overlay" />
         <div className="container site-footer-content">
