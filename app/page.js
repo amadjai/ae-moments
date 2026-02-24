@@ -628,6 +628,14 @@ const contactPhoneHref = "tel:+61452195855";
 const quoteWebhookUrl =
   "https://services.leadconnectorhq.com/hooks/KbLyUwHy2FrboitSpuPl/webhook-trigger/0f7be69b-cbc2-41a4-bb9f-b384ba8ae0d7";
 
+const formatEventDate = (eventDate) => {
+  const value = String(eventDate || "").trim();
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return value;
+  const [, year, month, day] = match;
+  return `${day}/${month}/${year}`;
+};
+
 function buildQuoteWebhookPayload(formData, bundleChoices) {
   const submittedAt = new Date().toISOString();
   const guestCount = Number(formData.guestCount) || 0;
@@ -635,6 +643,9 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
   const isCuratePath = formData.buildPath === "curate";
   const isBundlePath = formData.buildPath === "bundle";
   const quickUpgrades = formData.quickUpgrades ?? [];
+  const normalizedEventDate = formData.dateNotSure
+    ? ""
+    : formatEventDate(formData.eventDate);
   const selectedPathLabel = isBundlePath
     ? "Bundle & save money"
     : "Curate my own photo booth experience";
@@ -656,7 +667,7 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
   const summaryLine = [
     `${formData.eventType || "Event type not set"}`,
     `${guestCount || "?"} guests`,
-    formData.dateNotSure ? "Date not set" : formData.eventDate || "Date not set",
+    formData.dateNotSure ? "Date not set" : normalizedEventDate || "Date not set",
     selectedPathLabel
   ].join(" | ");
 
@@ -665,7 +676,7 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
     sourceForm: "AE Moments Quote Popup",
     summaryLine,
     eventType: formData.eventType || "",
-    eventDate: formData.dateNotSure ? "" : formData.eventDate || "",
+    eventDate: normalizedEventDate,
     eventDateNotSure: Boolean(formData.dateNotSure),
     guestCount: guestCount || "",
     buildPath: formData.buildPath || "",
@@ -752,7 +763,7 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
     eventBasics: {
       eventType: formData.eventType || null,
       eventDateStatus: formData.dateNotSure ? "not_sure_yet" : "confirmed_date",
-      eventDate: formData.dateNotSure ? null : formData.eventDate || null,
+      eventDate: normalizedEventDate || null,
       guestCount
     },
     experiencePath: {
@@ -803,7 +814,7 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
     },
     flat: {
       event_type: formData.eventType || "",
-      event_date: formData.dateNotSure ? "" : formData.eventDate || "",
+      event_date: normalizedEventDate,
       event_date_not_sure: Boolean(formData.dateNotSure),
       guest_count: guestCount || "",
       build_path: formData.buildPath || "",
@@ -1477,9 +1488,9 @@ function QuoteFormModal({ isOpen, onClose }) {
       }
       if (
         !formData.dateNotSure &&
-        !/^\d{2}\/\d{2}\/\d{4}$/.test(formData.eventDate.trim())
+        !/^\d{4}-\d{2}-\d{2}$/.test(formData.eventDate.trim())
       ) {
-        return "Please enter event date in dd/mm/yyyy format.";
+        return "Please choose a valid event date.";
       }
       if (!formData.guestCount || Number(formData.guestCount) <= 0) {
         return "Please enter a valid guest count.";
@@ -1669,12 +1680,10 @@ function QuoteFormModal({ isOpen, onClose }) {
                   <label className="quote-field">
                     <span>Event date*</span>
                     <input
-                      type="text"
+                      type="date"
                       value={formData.eventDate}
                       onChange={(event) => setField("eventDate", event.target.value)}
-                      inputMode="numeric"
-                      placeholder="dd/mm/yyyy"
-                      pattern="\d{2}/\d{2}/\d{4}"
+                      lang="en-GB"
                       disabled={formData.dateNotSure}
                     />
                   </label>
