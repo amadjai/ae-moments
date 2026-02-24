@@ -703,13 +703,71 @@ p {
   color: #101929;
 }
 
-.quote-field input[type="date"] {
-  display: block;
+.quote-date-proxy {
+  position: relative;
+  min-height: 2.9rem;
+  border-radius: 0.72rem;
+  border: 1px solid rgba(20, 29, 46, 0.17);
+  background: rgba(255, 255, 255, 0.88);
+  overflow: hidden;
+}
+
+.quote-date-proxy.is-disabled {
+  background: rgba(242, 245, 252, 0.85);
+}
+
+.quote-date-native {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  -webkit-appearance: none;
-  appearance: none;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.quote-date-proxy.is-disabled .quote-date-native {
+  pointer-events: none;
+}
+
+.quote-date-display {
+  min-height: 2.9rem;
+  padding: 0.58rem 2.85rem 0.58rem 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  color: #8892a5;
+  font-size: 1.08rem;
+  letter-spacing: 0.01em;
+}
+
+.quote-date-display.has-value {
+  color: #101929;
+}
+
+.quote-date-proxy.is-disabled .quote-date-display {
+  color: #9aa3b5;
+}
+
+.quote-date-icon {
+  position: absolute;
+  right: 0.72rem;
+  top: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  transform: translateY(-50%);
+  display: inline-grid;
+  place-items: center;
+  color: #121722;
+  pointer-events: none;
+}
+
+.quote-date-icon svg {
+  width: 1.38rem;
+  height: 1.38rem;
+  display: block;
+  fill: currentColor;
 }
 
 .quote-field textarea {
@@ -720,6 +778,11 @@ p {
 .quote-field input:focus,
 .quote-field select:focus,
 .quote-field textarea:focus {
+  outline: 2px solid rgba(16, 26, 42, 0.22);
+  outline-offset: 1px;
+}
+
+.quote-date-proxy:focus-within {
   outline: 2px solid rgba(16, 26, 42, 0.22);
   outline-offset: 1px;
 }
@@ -920,7 +983,7 @@ p {
     gap: 0.58rem;
   }
 
-  .quote-field input[type="date"] {
+  .quote-date-display {
     font-size: 0.96rem;
   }
 

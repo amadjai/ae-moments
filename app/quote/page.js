@@ -572,15 +572,37 @@ export default function QuotePage() {
                     <div className="quote-field-row">
                       <label className="quote-field">
                         <span>Event date*</span>
-                        <input
-                          type="date"
-                          value={formData.eventDate}
-                          onChange={(event) =>
-                            setField("eventDate", event.target.value)
-                          }
-                          lang="en-GB"
-                          disabled={formData.dateNotSure}
-                        />
+                        <div
+                          className={`quote-date-proxy ${
+                            formData.dateNotSure ? "is-disabled" : ""
+                          }`}
+                        >
+                          <input
+                            className="quote-date-native"
+                            type="date"
+                            value={formData.eventDate}
+                            onChange={(event) =>
+                              setField("eventDate", event.target.value)
+                            }
+                            lang="en-AU"
+                            disabled={formData.dateNotSure}
+                            aria-label="Event date"
+                          />
+                          <span
+                            className={`quote-date-display ${
+                              formData.eventDate ? "has-value" : ""
+                            }`}
+                          >
+                            {formData.eventDate
+                              ? formatEventDate(formData.eventDate)
+                              : "dd/mm/yyyy"}
+                          </span>
+                          <span className="quote-date-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" role="presentation">
+                              <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h1V3a1 1 0 0 1 1-1Zm12 8H5v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9Zm-1-4H6a1 1 0 0 0-1 1v1h14V7a1 1 0 0 0-1-1Z" />
+                            </svg>
+                          </span>
+                        </div>
                       </label>
                       <label className="quote-check-line">
                         <input
