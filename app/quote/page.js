@@ -76,6 +76,13 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
     bundleChoices && bundleChoices.length
       ? bundleChoices.join("; ")
       : "No bundle options";
+  const escapeHtml = (value) =>
+    String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
 
   const summaryLine = [
     `${formData.eventType || "Event type not set"}`,
@@ -114,32 +121,47 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
     message: formData.message || ""
   };
 
-  const automationDigestText = [
-    `Submitted At: ${submittedAt}`,
-    `Form Source: AE Moments Quote Page`,
-    `Summary: ${summaryLine}`,
-    `Event Type: ${automationFields.eventType || "N/A"}`,
-    `Event Date: ${automationFields.eventDateNotSure ? "Not sure yet" : automationFields.eventDate || "N/A"}`,
-    `Guest Count: ${automationFields.guestCount || "N/A"}`,
-    `Build Path: ${automationFields.buildPathLabel}`,
-    `Booth Choice: ${automationFields.boothChoice || "N/A"}`,
-    `Roaming Printing: ${automationFields.roamingPrinting || "N/A"}`,
-    `Bundle Choice: ${automationFields.bundleChoice || "N/A"}`,
-    `Bundle Options Shown: ${automationFields.bundleChoicesShown}`,
-    `Quick Upgrades: ${quickUpgradesText}`,
-    `Hire Duration: ${automationFields.hireDuration || "N/A"}`,
-    `Event Start Time: ${automationFields.eventStartTime || "N/A"}`,
-    `Event Finish Time: ${automationFields.eventFinishTime || "N/A"}`,
-    `Venue Name: ${automationFields.venueName || "N/A"}`,
-    `Venue Address: ${automationFields.venueAddress || "N/A"}`,
-    `Ceremony & Reception Same Venue: ${automationFields.weddingSameVenue || "N/A"}`,
-    `Name: ${automationFields.fullName || "N/A"}`,
-    `Partner Name: ${automationFields.partnerName || "N/A"}`,
-    `Mobile: ${automationFields.mobile || "N/A"}`,
-    `Email: ${automationFields.email || "N/A"}`,
-    `Instagram: ${automationFields.instagramHandle || "N/A"}`,
-    `Message: ${automationFields.message || "N/A"}`
-  ].join("\n");
+  const automationDigestItems = [
+    ["Submitted At", submittedAt],
+    ["Form Source", "AE Moments Quote Page"],
+    ["Summary", summaryLine],
+    ["Event Type", automationFields.eventType || "N/A"],
+    [
+      "Event Date",
+      automationFields.eventDateNotSure
+        ? "Not sure yet"
+        : automationFields.eventDate || "N/A"
+    ],
+    ["Guest Count", automationFields.guestCount || "N/A"],
+    ["Build Path", automationFields.buildPathLabel],
+    ["Booth Choice", automationFields.boothChoice || "N/A"],
+    ["Roaming Printing", automationFields.roamingPrinting || "N/A"],
+    ["Bundle Choice", automationFields.bundleChoice || "N/A"],
+    ["Bundle Options Shown", automationFields.bundleChoicesShown],
+    ["Quick Upgrades", quickUpgradesText],
+    ["Hire Duration", automationFields.hireDuration || "N/A"],
+    ["Event Start Time", automationFields.eventStartTime || "N/A"],
+    ["Event Finish Time", automationFields.eventFinishTime || "N/A"],
+    ["Venue Name", automationFields.venueName || "N/A"],
+    ["Venue Address", automationFields.venueAddress || "N/A"],
+    [
+      "Ceremony & Reception Same Venue",
+      automationFields.weddingSameVenue || "N/A"
+    ],
+    ["Name", automationFields.fullName || "N/A"],
+    ["Partner Name", automationFields.partnerName || "N/A"],
+    ["Mobile", automationFields.mobile || "N/A"],
+    ["Email", automationFields.email || "N/A"],
+    ["Instagram", automationFields.instagramHandle || "N/A"],
+    ["Message", automationFields.message || "N/A"]
+  ];
+
+  const automationDigestText = `<ul>${automationDigestItems
+    .map(
+      ([label, value]) =>
+        `<li><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</li>`
+    )
+    .join("")}</ul>`;
 
   return {
     webhookVersion: "1.2",
