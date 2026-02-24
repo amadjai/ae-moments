@@ -354,6 +354,12 @@ export default function QuotePage() {
       if (!formData.dateNotSure && !formData.eventDate) {
         return "Please choose your event date or tick “Not sure yet”.";
       }
+      if (
+        !formData.dateNotSure &&
+        !/^\d{2}\/\d{2}\/\d{4}$/.test(formData.eventDate.trim())
+      ) {
+        return "Please enter event date in dd/mm/yyyy format.";
+      }
       if (!formData.guestCount || Number(formData.guestCount) <= 0) {
         return "Please enter a valid guest count.";
       }
@@ -556,11 +562,14 @@ export default function QuotePage() {
                       <label className="quote-field">
                         <span>Event date*</span>
                         <input
-                          type="date"
+                          type="text"
                           value={formData.eventDate}
                           onChange={(event) =>
                             setField("eventDate", event.target.value)
                           }
+                          inputMode="numeric"
+                          placeholder="dd/mm/yyyy"
+                          pattern="\d{2}/\d{2}/\d{4}"
                           disabled={formData.dateNotSure}
                         />
                       </label>
