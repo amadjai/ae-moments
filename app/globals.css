@@ -3644,7 +3644,8 @@ p {
   line-height: 0.95;
   letter-spacing: -0.03em;
   color: #23262d;
-  max-width: 20ch;
+  max-width: none;
+  white-space: nowrap;
 }
 
 .sp-intro-copy {
@@ -6342,6 +6343,7 @@ body {
 
   .sp-intro h2 {
     font-size: clamp(1.6rem, 8.2vw, 2.5rem);
+    white-space: normal;
   }
 
   .sp-rating-line {

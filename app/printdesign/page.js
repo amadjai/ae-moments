@@ -20,7 +20,7 @@ export default function PrintDesignPage() {
         </Link>
         <nav className="nav-center" aria-label="Primary">
           <Link href="/">Home</Link>
-          <a href="/#studiobooth">StudioBooth System</a>
+          <a href="/#studiobooth">Open Air Booth</a>
           <a href="/#packages">Packages</a>
           <Link href="/quote">Quote</Link>
         </nav>
@@ -58,7 +58,6 @@ export default function PrintDesignPage() {
           <article className="card printdesign-frame">
             <iframe
               title="AE Moments Print Design Templates"
-              srcDoc="Loading templates..."
               src="https://templatesbooth.com/widget-embed/?key=OTU3"
               scrolling="yes"
               width="100%"

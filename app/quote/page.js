@@ -69,6 +69,13 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
   const selectedPathLabel = isBundlePath
     ? "Bundle & save money"
     : "Curate my own photo booth experience";
+  const quickUpgradesText = quickUpgrades.length
+    ? quickUpgrades.join("; ")
+    : "None selected";
+  const bundleChoicesText =
+    bundleChoices && bundleChoices.length
+      ? bundleChoices.join("; ")
+      : "No bundle options";
 
   const summaryLine = [
     `${formData.eventType || "Event type not set"}`,
@@ -76,6 +83,63 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
     formData.dateNotSure ? "Date not set" : formData.eventDate || "Date not set",
     selectedPathLabel
   ].join(" | ");
+
+  const automationFields = {
+    submittedAt,
+    sourceForm: "AE Moments Quote Page",
+    summaryLine,
+    eventType: formData.eventType || "",
+    eventDate: formData.dateNotSure ? "" : formData.eventDate || "",
+    eventDateNotSure: Boolean(formData.dateNotSure),
+    guestCount: guestCount || "",
+    buildPath: formData.buildPath || "",
+    buildPathLabel: selectedPathLabel,
+    boothChoice: formData.boothChoice || "",
+    roamingPrinting: formData.roamingPrinting || "",
+    bundleChoice: formData.bundleChoice || "",
+    bundleChoicesShown: bundleChoicesText,
+    quickUpgrades: quickUpgrades,
+    quickUpgradesText,
+    hireDuration: formData.hireDuration || "",
+    eventStartTime: formData.eventStartTime || "",
+    eventFinishTime: formData.eventFinishTime || "",
+    venueName: formData.venueName || "",
+    venueAddress: formData.venueAddress || "",
+    weddingSameVenue: formData.sameVenue || "",
+    fullName: formData.fullName || "",
+    partnerName: formData.partnerName || "",
+    mobile: formData.mobile || "",
+    email: formData.email || "",
+    instagramHandle: formData.instagram || "",
+    message: formData.message || ""
+  };
+
+  const automationDigestText = [
+    `Submitted At: ${submittedAt}`,
+    `Form Source: AE Moments Quote Page`,
+    `Summary: ${summaryLine}`,
+    `Event Type: ${automationFields.eventType || "N/A"}`,
+    `Event Date: ${automationFields.eventDateNotSure ? "Not sure yet" : automationFields.eventDate || "N/A"}`,
+    `Guest Count: ${automationFields.guestCount || "N/A"}`,
+    `Build Path: ${automationFields.buildPathLabel}`,
+    `Booth Choice: ${automationFields.boothChoice || "N/A"}`,
+    `Roaming Printing: ${automationFields.roamingPrinting || "N/A"}`,
+    `Bundle Choice: ${automationFields.bundleChoice || "N/A"}`,
+    `Bundle Options Shown: ${automationFields.bundleChoicesShown}`,
+    `Quick Upgrades: ${quickUpgradesText}`,
+    `Hire Duration: ${automationFields.hireDuration || "N/A"}`,
+    `Event Start Time: ${automationFields.eventStartTime || "N/A"}`,
+    `Event Finish Time: ${automationFields.eventFinishTime || "N/A"}`,
+    `Venue Name: ${automationFields.venueName || "N/A"}`,
+    `Venue Address: ${automationFields.venueAddress || "N/A"}`,
+    `Ceremony & Reception Same Venue: ${automationFields.weddingSameVenue || "N/A"}`,
+    `Name: ${automationFields.fullName || "N/A"}`,
+    `Partner Name: ${automationFields.partnerName || "N/A"}`,
+    `Mobile: ${automationFields.mobile || "N/A"}`,
+    `Email: ${automationFields.email || "N/A"}`,
+    `Instagram: ${automationFields.instagramHandle || "N/A"}`,
+    `Message: ${automationFields.message || "N/A"}`
+  ].join("\n");
 
   return {
     webhookVersion: "1.2",
@@ -141,6 +205,10 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
       selectedBooth: isCuratePath ? formData.boothChoice || null : null,
       selectedBundle: isBundlePath ? formData.bundleChoice || null : null,
       hasQuickUpgrades: quickUpgrades.length > 0
+    },
+    automationDigest: {
+      text: automationDigestText,
+      fields: automationFields
     },
     flat: {
       event_type: formData.eventType || "",
@@ -388,7 +456,7 @@ export default function QuotePage() {
         </a>
         <nav className="nav-center" aria-label="Primary">
           <a href="/">Home</a>
-          <a href="/#studiobooth">StudioBooth System</a>
+          <a href="/#studiobooth">Open Air Booth</a>
           <a href="/#packages">Packages</a>
           <a href="/printdesign">Print Designs</a>
         </nav>
@@ -701,48 +769,28 @@ export default function QuotePage() {
 
                     <label className="quote-field">
                       <span>Event Start Time*</span>
-                      <select
+                      <input
+                        type="text"
                         value={formData.eventStartTime}
                         onChange={(event) =>
                           setField("eventStartTime", event.target.value)
                         }
+                        placeholder="e.g. 5:30 PM"
                         required
-                      >
-                        <option value="">Select event start time</option>
-                        <option value="Morning (8:00am - 11:59am)">
-                          Morning (8:00am - 11:59am)
-                        </option>
-                        <option value="Midday (12:00pm - 2:59pm)">
-                          Midday (12:00pm - 2:59pm)
-                        </option>
-                        <option value="Afternoon (3:00pm - 5:59pm)">
-                          Afternoon (3:00pm - 5:59pm)
-                        </option>
-                        <option value="Evening (6:00pm - 8:59pm)">
-                          Evening (6:00pm - 8:59pm)
-                        </option>
-                        <option value="Night (9:00pm onwards)">
-                          Night (9:00pm onwards)
-                        </option>
-                      </select>
+                      />
                     </label>
 
                     <label className="quote-field">
                       <span>Event Finish Time*</span>
-                      <select
+                      <input
+                        type="text"
                         value={formData.eventFinishTime}
                         onChange={(event) =>
                           setField("eventFinishTime", event.target.value)
                         }
+                        placeholder="e.g. 11:45 PM"
                         required
-                      >
-                        <option value="">Select event finish time</option>
-                        <option value="Before 4:00pm">Before 4:00pm</option>
-                        <option value="4:00pm - 7:00pm">4:00pm - 7:00pm</option>
-                        <option value="7:00pm - 10:00pm">7:00pm - 10:00pm</option>
-                        <option value="10:00pm - Midnight">10:00pm - Midnight</option>
-                        <option value="After Midnight">After Midnight</option>
-                      </select>
+                      />
                     </label>
 
                     <label className="quote-field">
