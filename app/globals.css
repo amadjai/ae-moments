@@ -4902,7 +4902,7 @@ p {
     margin: 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    touch-action: pan-x;
+    overscroll-behavior-x: contain;
   }
 
   .video-carousel-track::-webkit-scrollbar {
