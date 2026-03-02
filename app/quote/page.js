@@ -7,6 +7,14 @@ const siteLogoUrl =
 
 const quoteWebhookUrl =
   "https://services.leadconnectorhq.com/hooks/KbLyUwHy2FrboitSpuPl/webhook-trigger/0f7be69b-cbc2-41a4-bb9f-b384ba8ae0d7";
+const googleAdsQuoteConversionSendTo = "AW-17980189545/r1fKCK-HhIAcEOnWz_1C";
+
+const trackQuoteConversion = () => {
+  if (typeof window === "undefined" || typeof window.gtag !== "function") return;
+  window.gtag("event", "conversion", {
+    send_to: googleAdsQuoteConversionSendTo
+  });
+};
 
 const formatEventDate = (eventDate) => {
   const value = String(eventDate || "").trim();
@@ -457,6 +465,7 @@ export default function QuotePage() {
         throw new Error(`Webhook request failed with status ${response.status}`);
       }
 
+      trackQuoteConversion();
       setIsSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (errorCaught) {
@@ -470,6 +479,7 @@ export default function QuotePage() {
             },
             body: JSON.stringify(payload)
           });
+          trackQuoteConversion();
           setIsSubmitted(true);
           window.scrollTo({ top: 0, behavior: "smooth" });
         } catch {

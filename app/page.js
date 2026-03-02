@@ -623,10 +623,40 @@ const siteLogoUrl =
 const instagramUrl = "https://www.instagram.com/aemoments.au";
 const facebookUrl = "https://www.facebook.com/aemoments.au";
 const contactEmail = "admin@aemoments.com.au";
-const contactPhone = "0452 195 855";
-const contactPhoneHref = "tel:+61452195855";
+const contactPhone = "0468 165 827";
+const contactPhoneHref = "tel:+61468165827";
 const quoteWebhookUrl =
   "https://services.leadconnectorhq.com/hooks/KbLyUwHy2FrboitSpuPl/webhook-trigger/0f7be69b-cbc2-41a4-bb9f-b384ba8ae0d7";
+const googleAdsQuoteConversionSendTo = "AW-17980189545/r1fKCK-HhIAcEOnWz_1C";
+const showcaseVideos = [
+  {
+    id: "showcase-1",
+    title: "Event Reel 01",
+    src: "https://vz-d0f5a6cf-5fa.b-cdn.net/d58a21b8-e0e9-4811-9883-bc06aba43b21/playlist.m3u8"
+  },
+  {
+    id: "showcase-2",
+    title: "Event Reel 02",
+    src: "https://vz-d0f5a6cf-5fa.b-cdn.net/d93e1730-f29d-49be-9146-ec11d6c87254/playlist.m3u8"
+  },
+  {
+    id: "showcase-3",
+    title: "Event Reel 03",
+    src: "https://vz-d0f5a6cf-5fa.b-cdn.net/9fb97539-4769-4de2-b270-92713c48d124/playlist.m3u8"
+  },
+  {
+    id: "showcase-4",
+    title: "Event Reel 04",
+    src: "https://vz-d0f5a6cf-5fa.b-cdn.net/3c15dab3-4e96-45bc-a3fe-0ffe98690f38/playlist.m3u8"
+  }
+];
+
+const trackQuoteConversion = () => {
+  if (typeof window === "undefined" || typeof window.gtag !== "function") return;
+  window.gtag("event", "conversion", {
+    send_to: googleAdsQuoteConversionSendTo
+  });
+};
 
 const formatEventDate = (eventDate) => {
   const value = String(eventDate || "").trim();
@@ -1578,6 +1608,7 @@ function QuoteFormModal({ isOpen, onClose }) {
         throw new Error(`Webhook request failed with status ${response.status}`);
       }
 
+      trackQuoteConversion();
       setIsSubmitted(true);
     } catch (errorCaught) {
       if (errorCaught instanceof TypeError) {
@@ -1590,6 +1621,7 @@ function QuoteFormModal({ isOpen, onClose }) {
             },
             body: JSON.stringify(payload)
           });
+          trackQuoteConversion();
           setIsSubmitted(true);
         } catch {
           setFormError(
@@ -2112,9 +2144,13 @@ export default function Home() {
   const [rightVisible, setRightVisible] = useState([0, 1, 2]);
   const [activeUspShot, setActiveUspShot] = useState(0);
   const [isUspStackEntered, setIsUspStackEntered] = useState(false);
+  const [playingShowcaseVideo, setPlayingShowcaseVideo] = useState(null);
+  const [isMobileReel, setIsMobileReel] = useState(false);
   const [upgradeBasket, setUpgradeBasket] = useState([]);
   const [upgradeFlyers, setUpgradeFlyers] = useState([]);
   const uspSwiperRef = useRef(null);
+  const showcaseVideoRefs = useRef([]);
+  const hlsInstancesRef = useRef([]);
   const upgradeFolderRef = useRef(null);
   const mobileQuoteRef = useRef(null);
   const uspLeftSteps = uspSteps.slice(0, 2);
@@ -2235,6 +2271,35 @@ export default function Home() {
     scrollToPackages("bundle");
   };
 
+  const pauseShowcaseVideos = () => {
+    showcaseVideoRefs.current.forEach((videoNode) => {
+      if (!videoNode) return;
+      videoNode.pause();
+    });
+    setPlayingShowcaseVideo(null);
+  };
+
+  const toggleShowcasePlayback = (index) => {
+    const activeVideoNode = showcaseVideoRefs.current[index];
+    if (!activeVideoNode) return;
+
+    if (playingShowcaseVideo === index && !activeVideoNode.paused) {
+      activeVideoNode.pause();
+      setPlayingShowcaseVideo(null);
+      return;
+    }
+
+    pauseShowcaseVideos();
+    const playback = activeVideoNode.play();
+    if (playback && typeof playback.then === "function") {
+      playback
+        .then(() => setPlayingShowcaseVideo(index))
+        .catch(() => setPlayingShowcaseVideo(null));
+    } else {
+      setPlayingShowcaseVideo(index);
+    }
+  };
+
   const handleUspKeyDown = (event) => {
     const swiper = uspSwiperRef.current;
     if (!swiper) return;
@@ -2248,6 +2313,21 @@ export default function Home() {
       swiper.slideNext();
     }
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const query = window.matchMedia("(max-width: 1199px)");
+    const sync = () => setIsMobileReel(query.matches);
+    sync();
+
+    if (typeof query.addEventListener === "function") {
+      query.addEventListener("change", sync);
+      return () => query.removeEventListener("change", sync);
+    }
+
+    query.addListener(sync);
+    return () => query.removeListener(sync);
+  }, []);
 
   useEffect(() => {
     const rotateDown = (visible, total) => {
@@ -2291,6 +2371,103 @@ export default function Home() {
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
   }, [activeTab]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const setupShowcaseHls = async () => {
+      if (typeof window === "undefined") return;
+
+      const module = await import("hls.js");
+      const Hls = module.default;
+      if (!isMounted) return;
+
+      showcaseVideos.forEach((item, index) => {
+        const videoNode = showcaseVideoRefs.current[index];
+        if (!videoNode) return;
+
+        if (videoNode.canPlayType("application/vnd.apple.mpegurl")) {
+          videoNode.src = item.src;
+          return;
+        }
+
+        if (Hls.isSupported()) {
+          const hls = new Hls({
+            enableWorker: true,
+            lowLatencyMode: true
+          });
+          hls.loadSource(item.src);
+          hls.attachMedia(videoNode);
+          hlsInstancesRef.current.push(hls);
+          return;
+        }
+
+        videoNode.src = item.src;
+      });
+    };
+
+    setupShowcaseHls();
+
+    return () => {
+      isMounted = false;
+      hlsInstancesRef.current.forEach((hls) => hls.destroy());
+      hlsInstancesRef.current = [];
+      showcaseVideoRefs.current.forEach((videoNode) => {
+        if (!videoNode) return;
+        videoNode.pause();
+        videoNode.removeAttribute("src");
+        videoNode.load();
+      });
+    };
+  }, [isMobileReel]);
+
+  const renderShowcaseCard = (item, index) => (
+    <article className="video-carousel-card" style={{ animationDelay: `${index * 90}ms` }}>
+      <div className="video-carousel-media">
+        <video
+          ref={(node) => {
+            showcaseVideoRefs.current[index] = node;
+          }}
+          playsInline
+          preload="metadata"
+          controls={false}
+          muted={false}
+          onPlay={() => {
+            setPlayingShowcaseVideo(index);
+          }}
+          onPause={() => {
+            setPlayingShowcaseVideo((current) =>
+              current === index ? null : current
+            );
+          }}
+          onEnded={() => {
+            setPlayingShowcaseVideo((current) =>
+              current === index ? null : current
+            );
+          }}
+        />
+        <div className="video-carousel-overlay">
+          <button
+            type="button"
+            className="video-carousel-play"
+            onClick={() => toggleShowcasePlayback(index)}
+            aria-label={playingShowcaseVideo === index ? "Pause video" : "Play video"}
+          >
+            {playingShowcaseVideo === index ? "Pause" : "Play"}
+          </button>
+          {playingShowcaseVideo !== index ? (
+            <span className="video-carousel-overlay-hint">
+              Tap play to preview this reel
+            </span>
+          ) : null}
+        </div>
+      </div>
+      <div className="video-carousel-meta">
+        <p>{item.title}</p>
+        <span>Vertical Reel</span>
+      </div>
+    </article>
+  );
 
   return (
     <main className="page-shell">
@@ -2994,6 +3171,55 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="section video-carousel" id="reels">
+        <div className="container video-carousel-shell">
+          <div className="video-carousel-head">
+            <SectionPill label="Highlights" />
+            <h2>Real events, real moments</h2>
+            <p className="section-lead">
+              Swipe through live event highlights. Tap play to watch, pause when
+              you&apos;re done.
+            </p>
+          </div>
+
+          <div className="card video-carousel-frame">
+            {isMobileReel ? (
+              <Swiper
+                slidesPerView={1.12}
+                spaceBetween={12}
+                speed={460}
+                loop={false}
+                breakpoints={{
+                  680: {
+                    slidesPerView: 1.48,
+                    spaceBetween: 14
+                  }
+                }}
+                nested
+                touchStartPreventDefault={false}
+                touchMoveStopPropagation={false}
+                className="video-carousel-swiper"
+                onSlideChange={() => {
+                  pauseShowcaseVideos();
+                }}
+              >
+                {showcaseVideos.map((item, index) => (
+                  <SwiperSlide key={item.id}>{renderShowcaseCard(item, index)}</SwiperSlide>
+                ))}
+              </Swiper>
+            ) : (
+              <div className="video-reel-grid">
+                {showcaseVideos.map((item, index) => (
+                  <div key={item.id} className="video-reel-grid-item">
+                    {renderShowcaseCard(item, index)}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       <QuoteFormModal isOpen={isQuoteModalOpen} onClose={closeQuoteModal} />
 
       <footer className="site-footer">
@@ -3041,14 +3267,26 @@ export default function Home() {
               <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
               <a href={contactPhoneHref}>{contactPhone}</a>
             </div>
-            <a
-              href="#quote"
-              className="button solid site-footer-button"
-              onClick={openQuoteModal}
-            >
-              <span>Get Started</span>
-              <span className="button-arrow">→</span>
-            </a>
+            <div className="site-footer-cta-row">
+              <a
+                href="#quote"
+                className="button solid site-footer-button"
+                onClick={openQuoteModal}
+              >
+                <span>Get Started</span>
+                <span className="button-arrow">→</span>
+              </a>
+              <a
+                href={contactPhoneHref}
+                className="site-footer-phone-cta"
+                aria-label={`Call ${contactPhone}`}
+                title={`Call ${contactPhone}`}
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M18.35 14.25c-.62-.18-1.6.06-2.12.59l-1.19 1.19a15.88 15.88 0 0 1-7.08-7.08l1.19-1.19c.53-.53.77-1.5.59-2.12L9.02 3.2A1.9 1.9 0 0 0 7.16 2H4.74A1.74 1.74 0 0 0 3 3.74C3 13.83 10.17 21 20.26 21A1.74 1.74 0 0 0 22 19.26v-2.42a1.9 1.9 0 0 0-1.2-1.82l-2.45-.77Z" />
+                </svg>
+              </a>
+            </div>
           </div>
           <nav className="site-footer-links">
             <a href="#studiobooth">Open Air Booth</a>
