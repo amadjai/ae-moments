@@ -2144,13 +2144,13 @@ export default function Home() {
   const [rightVisible, setRightVisible] = useState([0, 1, 2]);
   const [activeUspShot, setActiveUspShot] = useState(0);
   const [isUspStackEntered, setIsUspStackEntered] = useState(false);
-  const [playingShowcaseVideo, setPlayingShowcaseVideo] = useState(null);
-  const [isMobileReel, setIsMobileReel] = useState(false);
+  const [playingShowcaseVideos, setPlayingShowcaseVideos] = useState({});
   const [upgradeBasket, setUpgradeBasket] = useState([]);
   const [upgradeFlyers, setUpgradeFlyers] = useState([]);
   const uspSwiperRef = useRef(null);
   const showcaseVideoRefs = useRef([]);
   const hlsInstancesRef = useRef([]);
+  const videoCarouselTrackRef = useRef(null);
   const upgradeFolderRef = useRef(null);
   const mobileQuoteRef = useRef(null);
   const uspLeftSteps = uspSteps.slice(0, 2);
@@ -2276,28 +2276,52 @@ export default function Home() {
       if (!videoNode) return;
       videoNode.pause();
     });
-    setPlayingShowcaseVideo(null);
+    setPlayingShowcaseVideos({});
   };
 
   const toggleShowcasePlayback = (index) => {
     const activeVideoNode = showcaseVideoRefs.current[index];
     if (!activeVideoNode) return;
 
-    if (playingShowcaseVideo === index && !activeVideoNode.paused) {
+    if (!activeVideoNode.paused) {
       activeVideoNode.pause();
-      setPlayingShowcaseVideo(null);
+      setPlayingShowcaseVideos((current) => ({ ...current, [index]: false }));
       return;
     }
 
-    pauseShowcaseVideos();
+    activeVideoNode.muted = true;
+    activeVideoNode.defaultMuted = true;
+    activeVideoNode.volume = 0;
     const playback = activeVideoNode.play();
     if (playback && typeof playback.then === "function") {
       playback
-        .then(() => setPlayingShowcaseVideo(index))
-        .catch(() => setPlayingShowcaseVideo(null));
+        .then(() =>
+          setPlayingShowcaseVideos((current) => ({ ...current, [index]: true }))
+        )
+        .catch(() =>
+          setPlayingShowcaseVideos((current) => ({ ...current, [index]: false }))
+        );
     } else {
-      setPlayingShowcaseVideo(index);
+      setPlayingShowcaseVideos((current) => ({ ...current, [index]: true }));
     }
+  };
+
+  const scrollVideoCarousel = (direction) => {
+    if (typeof window === "undefined") return;
+    const trackNode = videoCarouselTrackRef.current;
+    if (!trackNode) return;
+
+    const firstCard = trackNode.querySelector(".video-reel-grid-item");
+    const styles = window.getComputedStyle(trackNode);
+    const gap = parseFloat(styles.columnGap || styles.gap || "0") || 0;
+    const step = firstCard
+      ? firstCard.getBoundingClientRect().width + gap
+      : trackNode.clientWidth * 0.86;
+
+    trackNode.scrollBy({
+      left: direction * step,
+      behavior: "smooth"
+    });
   };
 
   const handleUspKeyDown = (event) => {
@@ -2313,21 +2337,6 @@ export default function Home() {
       swiper.slideNext();
     }
   };
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const query = window.matchMedia("(max-width: 1199px)");
-    const sync = () => setIsMobileReel(query.matches);
-    sync();
-
-    if (typeof query.addEventListener === "function") {
-      query.addEventListener("change", sync);
-      return () => query.removeEventListener("change", sync);
-    }
-
-    query.addListener(sync);
-    return () => query.removeListener(sync);
-  }, []);
 
   useEffect(() => {
     const rotateDown = (visible, total) => {
@@ -2385,6 +2394,13 @@ export default function Home() {
       showcaseVideos.forEach((item, index) => {
         const videoNode = showcaseVideoRefs.current[index];
         if (!videoNode) return;
+        videoNode.muted = true;
+        videoNode.defaultMuted = true;
+        videoNode.volume = 0;
+        videoNode.playsInline = true;
+        videoNode.setAttribute("muted", "");
+        videoNode.setAttribute("playsinline", "");
+        videoNode.setAttribute("webkit-playsinline", "");
 
         if (videoNode.canPlayType("application/vnd.apple.mpegurl")) {
           videoNode.src = item.src;
@@ -2412,6 +2428,7 @@ export default function Home() {
       isMounted = false;
       hlsInstancesRef.current.forEach((hls) => hls.destroy());
       hlsInstancesRef.current = [];
+      setPlayingShowcaseVideos({});
       showcaseVideoRefs.current.forEach((videoNode) => {
         if (!videoNode) return;
         videoNode.pause();
@@ -2419,7 +2436,7 @@ export default function Home() {
         videoNode.load();
       });
     };
-  }, [isMobileReel]);
+  }, []);
 
   const renderShowcaseCard = (item, index) => (
     <article className="video-carousel-card" style={{ animationDelay: `${index * 90}ms` }}>
@@ -2429,21 +2446,20 @@ export default function Home() {
             showcaseVideoRefs.current[index] = node;
           }}
           playsInline
-          preload="metadata"
+          preload="auto"
           controls={false}
-          muted={false}
+          muted
+          defaultMuted
+          loop
+          autoPlay
           onPlay={() => {
-            setPlayingShowcaseVideo(index);
+            setPlayingShowcaseVideos((current) => ({ ...current, [index]: true }));
           }}
           onPause={() => {
-            setPlayingShowcaseVideo((current) =>
-              current === index ? null : current
-            );
+            setPlayingShowcaseVideos((current) => ({ ...current, [index]: false }));
           }}
           onEnded={() => {
-            setPlayingShowcaseVideo((current) =>
-              current === index ? null : current
-            );
+            setPlayingShowcaseVideos((current) => ({ ...current, [index]: false }));
           }}
         />
         <div className="video-carousel-overlay">
@@ -2451,11 +2467,13 @@ export default function Home() {
             type="button"
             className="video-carousel-play"
             onClick={() => toggleShowcasePlayback(index)}
-            aria-label={playingShowcaseVideo === index ? "Pause video" : "Play video"}
+            aria-label={
+              playingShowcaseVideos[index] ? "Pause video" : "Play video"
+            }
           >
-            {playingShowcaseVideo === index ? "Pause" : "Play"}
+            {playingShowcaseVideos[index] ? "Pause" : "Play"}
           </button>
-          {playingShowcaseVideo !== index ? (
+          {!playingShowcaseVideos[index] ? (
             <span className="video-carousel-overlay-hint">
               Tap play to preview this reel
             </span>
@@ -3183,39 +3201,35 @@ export default function Home() {
           </div>
 
           <div className="card video-carousel-frame">
-            {isMobileReel ? (
-              <Swiper
-                slidesPerView={1.12}
-                spaceBetween={12}
-                speed={460}
-                loop={false}
-                breakpoints={{
-                  680: {
-                    slidesPerView: 1.48,
-                    spaceBetween: 14
-                  }
-                }}
-                nested
-                touchStartPreventDefault={false}
-                touchMoveStopPropagation={false}
-                className="video-carousel-swiper"
-                onSlideChange={() => {
-                  pauseShowcaseVideos();
-                }}
+            <div
+              ref={videoCarouselTrackRef}
+              className="video-carousel-track"
+              onMouseLeave={pauseShowcaseVideos}
+            >
+              {showcaseVideos.map((item, index) => (
+                <div key={item.id} className="video-reel-grid-item">
+                  {renderShowcaseCard(item, index)}
+                </div>
+              ))}
+            </div>
+            <div className="video-carousel-mobile-nav" aria-label="Reel navigation">
+              <button
+                type="button"
+                className="video-carousel-nav-btn"
+                onClick={() => scrollVideoCarousel(-1)}
+                aria-label="Previous reel"
               >
-                {showcaseVideos.map((item, index) => (
-                  <SwiperSlide key={item.id}>{renderShowcaseCard(item, index)}</SwiperSlide>
-                ))}
-              </Swiper>
-            ) : (
-              <div className="video-reel-grid">
-                {showcaseVideos.map((item, index) => (
-                  <div key={item.id} className="video-reel-grid-item">
-                    {renderShowcaseCard(item, index)}
-                  </div>
-                ))}
-              </div>
-            )}
+                ←
+              </button>
+              <button
+                type="button"
+                className="video-carousel-nav-btn"
+                onClick={() => scrollVideoCarousel(1)}
+                aria-label="Next reel"
+              >
+                →
+              </button>
+            </div>
           </div>
         </div>
       </section>
