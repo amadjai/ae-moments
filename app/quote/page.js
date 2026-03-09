@@ -16,6 +16,11 @@ const trackQuoteConversion = () => {
   });
 };
 
+const trackMetaLead = () => {
+  if (typeof window === "undefined" || typeof window.fbq !== "function") return;
+  window.fbq("track", "Lead");
+};
+
 const formatEventDate = (eventDate) => {
   const value = String(eventDate || "").trim();
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -466,6 +471,7 @@ export default function QuotePage() {
       }
 
       trackQuoteConversion();
+      trackMetaLead();
       setIsSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (errorCaught) {
@@ -480,6 +486,7 @@ export default function QuotePage() {
             body: JSON.stringify(payload)
           });
           trackQuoteConversion();
+          trackMetaLead();
           setIsSubmitted(true);
           window.scrollTo({ top: 0, behavior: "smooth" });
         } catch {

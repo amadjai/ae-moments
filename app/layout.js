@@ -20,6 +20,15 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src="https://www.facebook.com/tr?id=335302416203331&ev=PageView&noscript=1"
+            alt=""
+          />
+        </noscript>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17980189545"
           strategy="beforeInteractive"
@@ -35,6 +44,20 @@ export default function RootLayout({ children }) {
             gtag('config', 'AW-17980189545/qDdqCKnLg4AcEOnWz_1C', {
               phone_conversion_number: '0468 165 827'
             });
+          `}
+        </Script>
+        <Script id="meta-pixel-init" strategy="beforeInteractive">
+          {`
+            !function(f,b,e,v,n,t,s)
+            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)}(window, document,'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '335302416203331');
+            fbq('track', 'PageView');
           `}
         </Script>
         <Script id="email-click-tracking" strategy="afterInteractive">

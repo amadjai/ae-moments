@@ -658,6 +658,11 @@ const trackQuoteConversion = () => {
   });
 };
 
+const trackMetaLead = () => {
+  if (typeof window === "undefined" || typeof window.fbq !== "function") return;
+  window.fbq("track", "Lead");
+};
+
 const formatEventDate = (eventDate) => {
   const value = String(eventDate || "").trim();
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -1609,6 +1614,7 @@ function QuoteFormModal({ isOpen, onClose }) {
       }
 
       trackQuoteConversion();
+      trackMetaLead();
       setIsSubmitted(true);
     } catch (errorCaught) {
       if (errorCaught instanceof TypeError) {
@@ -1622,6 +1628,7 @@ function QuoteFormModal({ isOpen, onClose }) {
             body: JSON.stringify(payload)
           });
           trackQuoteConversion();
+          trackMetaLead();
           setIsSubmitted(true);
         } catch {
           setFormError(
@@ -2624,6 +2631,51 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="section video-carousel" id="reels">
+        <div className="container video-carousel-shell">
+          <div className="video-carousel-head">
+            <SectionPill label="Highlights" />
+            <h2>Real events, real moments</h2>
+            <p className="section-lead">
+              Swipe through live event highlights. Tap play to watch, pause when
+              you&apos;re done.
+            </p>
+          </div>
+
+          <div className="card video-carousel-frame">
+            <div
+              ref={videoCarouselTrackRef}
+              className="video-carousel-track"
+              onMouseLeave={pauseShowcaseVideos}
+            >
+              {showcaseVideos.map((item, index) => (
+                <div key={item.id} className="video-reel-grid-item">
+                  {renderShowcaseCard(item, index)}
+                </div>
+              ))}
+            </div>
+            <div className="video-carousel-mobile-nav" aria-label="Reel navigation">
+              <button
+                type="button"
+                className="video-carousel-nav-btn"
+                onClick={() => scrollVideoCarousel(-1)}
+                aria-label="Previous reel"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                className="video-carousel-nav-btn"
+                onClick={() => scrollVideoCarousel(1)}
+                aria-label="Next reel"
+              >
+                →
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="section usp" id="studiobooth">
         <div className="container usp-shell">
           <p className="eyebrow" data-reveal>
@@ -3186,51 +3238,6 @@ export default function Home() {
               </div>
             </div>
           </article>
-        </div>
-      </section>
-
-      <section className="section video-carousel" id="reels">
-        <div className="container video-carousel-shell">
-          <div className="video-carousel-head">
-            <SectionPill label="Highlights" />
-            <h2>Real events, real moments</h2>
-            <p className="section-lead">
-              Swipe through live event highlights. Tap play to watch, pause when
-              you&apos;re done.
-            </p>
-          </div>
-
-          <div className="card video-carousel-frame">
-            <div
-              ref={videoCarouselTrackRef}
-              className="video-carousel-track"
-              onMouseLeave={pauseShowcaseVideos}
-            >
-              {showcaseVideos.map((item, index) => (
-                <div key={item.id} className="video-reel-grid-item">
-                  {renderShowcaseCard(item, index)}
-                </div>
-              ))}
-            </div>
-            <div className="video-carousel-mobile-nav" aria-label="Reel navigation">
-              <button
-                type="button"
-                className="video-carousel-nav-btn"
-                onClick={() => scrollVideoCarousel(-1)}
-                aria-label="Previous reel"
-              >
-                ←
-              </button>
-              <button
-                type="button"
-                className="video-carousel-nav-btn"
-                onClick={() => scrollVideoCarousel(1)}
-                aria-label="Next reel"
-              >
-                →
-              </button>
-            </div>
-          </div>
         </div>
       </section>
 
