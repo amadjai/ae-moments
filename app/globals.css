@@ -2226,6 +2226,13 @@ p {
   color: #556074;
 }
 
+.package-price-note {
+  margin: 0.18rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: #6b7280;
+}
+
 .package-action {
   margin-top: 0.92rem;
   min-height: 2.8rem;

@@ -143,6 +143,8 @@ const audienceIllustrationImages = {
   sync: "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698c04f652c95251f1eb398d.jpg"
 };
 
+const pricingSurchargeNote = "additional travel & parking surcharges may apply";
+
 const standardRates = [
   {
     name: "Open Air Booth",
@@ -1072,6 +1074,7 @@ function StandardCard({ item, onCtaClick }) {
             <p key={line}>{line}</p>
           ))}
         </div>
+        <p className="package-price-note">{pricingSurchargeNote}</p>
       </div>
       <a href="#quote" className="package-action" onClick={onCtaClick}>
         Get Started
@@ -1210,6 +1213,7 @@ function BundleCard({ item, onCtaClick }) {
           <span>Bundle price</span> <strong>{item.bundlePrice}</strong>
         </p>
         <p className="save">Save {item.savings}</p>
+        <p className="package-price-note">{pricingSurchargeNote}</p>
       </div>
       <h4>Includes</h4>
       <ul className="line-list bundle-includes">
