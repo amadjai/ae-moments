@@ -627,7 +627,8 @@ const facebookUrl = "https://www.facebook.com/aemoments.au";
 const contactEmail = "admin@aemoments.com.au";
 const contactPhone = "0468 165 827";
 const contactPhoneHref = "tel:+61468165827";
-const quoteSubmitPath = "/api/quote";
+const quoteWebhookUrl =
+  "https://services.leadconnectorhq.com/hooks/KbLyUwHy2FrboitSpuPl/webhook-trigger/0f7be69b-cbc2-41a4-bb9f-b384ba8ae0d7";
 const googleAdsQuoteConversionSendTo = "AW-17980189545/r1fKCK-HhIAcEOnWz_1C";
 const showcaseVideos = [
   {
@@ -1621,7 +1622,7 @@ function QuoteFormModal({ isOpen, onClose }) {
     const payload = buildQuoteWebhookPayload(formData, bundleChoices);
 
     try {
-      const response = await fetch(quoteSubmitPath, {
+      const response = await fetch(quoteWebhookUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -1630,19 +1631,36 @@ function QuoteFormModal({ isOpen, onClose }) {
       });
 
       if (!response.ok) {
-        const { error: submitError } = await response.json().catch(() => ({}));
-        throw new Error(submitError || `Webhook request failed with status ${response.status}`);
+        throw new Error(`Webhook request failed with status ${response.status}`);
       }
 
       trackQuoteConversion();
       trackMetaLead();
       setIsSubmitted(true);
     } catch (errorCaught) {
-      setFormError(
-        errorCaught instanceof Error && errorCaught.message
-          ? errorCaught.message
-          : "Couldn’t submit right now. Please try again, or contact us directly."
-      );
+      if (errorCaught instanceof TypeError) {
+        try {
+          await fetch(quoteWebhookUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+              "Content-Type": "text/plain;charset=UTF-8"
+            },
+            body: JSON.stringify(payload)
+          });
+          trackQuoteConversion();
+          trackMetaLead();
+          setIsSubmitted(true);
+        } catch {
+          setFormError(
+            "Couldn’t submit right now. Please try again, or contact us directly."
+          );
+        }
+      } else {
+        setFormError(
+          "Couldn’t submit right now. Please try again, or contact us directly."
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }

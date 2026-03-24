@@ -5,7 +5,8 @@ import { useMemo, useState } from "react";
 const siteLogoUrl =
   "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698d55d552c9526c6c263eb3.png";
 
-const quoteSubmitPath = "/api/quote";
+const quoteWebhookUrl =
+  "https://services.leadconnectorhq.com/hooks/KbLyUwHy2FrboitSpuPl/webhook-trigger/0f7be69b-cbc2-41a4-bb9f-b384ba8ae0d7";
 const googleAdsQuoteConversionSendTo = "AW-17980189545/r1fKCK-HhIAcEOnWz_1C";
 
 const trackQuoteConversion = () => {
@@ -474,7 +475,7 @@ export default function QuotePage() {
     const payload = buildQuoteWebhookPayload(formData, bundleChoices);
 
     try {
-      const response = await fetch(quoteSubmitPath, {
+      const response = await fetch(quoteWebhookUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -483,8 +484,7 @@ export default function QuotePage() {
       });
 
       if (!response.ok) {
-        const { error: submitError } = await response.json().catch(() => ({}));
-        throw new Error(submitError || `Webhook request failed with status ${response.status}`);
+        throw new Error(`Webhook request failed with status ${response.status}`);
       }
 
       trackQuoteConversion();
@@ -492,11 +492,30 @@ export default function QuotePage() {
       setIsSubmitted(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (errorCaught) {
-      setFormError(
-        errorCaught instanceof Error && errorCaught.message
-          ? errorCaught.message
-          : "Couldn’t submit right now. Please try again, or contact us directly."
-      );
+      if (errorCaught instanceof TypeError) {
+        try {
+          await fetch(quoteWebhookUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+              "Content-Type": "text/plain;charset=UTF-8"
+            },
+            body: JSON.stringify(payload)
+          });
+          trackQuoteConversion();
+          trackMetaLead();
+          setIsSubmitted(true);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch {
+          setFormError(
+            "Couldn’t submit right now. Please try again, or contact us directly."
+          );
+        }
+      } else {
+        setFormError(
+          "Couldn’t submit right now. Please try again, or contact us directly."
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
