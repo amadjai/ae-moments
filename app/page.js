@@ -627,8 +627,7 @@ const facebookUrl = "https://www.facebook.com/aemoments.au";
 const contactEmail = "admin@aemoments.com.au";
 const contactPhone = "0468 165 827";
 const contactPhoneHref = "tel:+61468165827";
-const quoteWebhookUrl =
-  "https://services.leadconnectorhq.com/hooks/KbLyUwHy2FrboitSpuPl/webhook-trigger/0f7be69b-cbc2-41a4-bb9f-b384ba8ae0d7";
+const quoteSubmitPath = "/api/quote";
 const googleAdsQuoteConversionSendTo = "AW-17980189545/r1fKCK-HhIAcEOnWz_1C";
 const showcaseVideos = [
   {
@@ -1024,6 +1023,72 @@ const quoteFormInitialState = {
   message: ""
 };
 
+const getQuoteStepError = (step, formData, validationState) => {
+  const { isWedding, isBundlePath, isCuratePath, isRoamingBooth } = validationState;
+
+  if (step === 1) {
+    if (!formData.eventType) return "Please select your event type.";
+    if (!formData.dateNotSure && !formData.eventDate) {
+      return "Please choose your event date or tick “Not sure yet”.";
+    }
+    if (!formData.dateNotSure && !/^\d{4}-\d{2}-\d{2}$/.test(formData.eventDate.trim())) {
+      return "Please choose a valid event date.";
+    }
+    if (!formData.guestCount || Number(formData.guestCount) <= 0) {
+      return "Please enter a valid guest count.";
+    }
+  }
+
+  if (step === 2 && !formData.buildPath) {
+    return "Please choose how you'd like to build your experience.";
+  }
+
+  if (step === 3) {
+    if (isCuratePath) {
+      if (!formData.boothChoice) return "Please choose your main booth experience.";
+      if (isRoamingBooth && !formData.roamingPrinting) {
+        return "Please select your roaming printing preference.";
+      }
+    }
+
+    if (isBundlePath && !formData.bundleChoice) {
+      return "Please choose a bundle option.";
+    }
+  }
+
+  if (step === 4) {
+    if (!formData.hireDuration) return "Please select the hire duration.";
+    if (isWedding && formData.hireDuration === "3 hours") {
+      return "For weddings, minimum booking is 4 hours.";
+    }
+    if (!formData.eventStartTime) return "Please choose an event start time.";
+    if (!formData.eventFinishTime) return "Please choose an event finish time.";
+    if (!formData.venueAddress.trim()) return "Please add venue suburb or address.";
+  }
+
+  if (step === 5) {
+    if (!formData.fullName.trim()) return "Please enter your name.";
+    if (!formData.mobile.trim()) return "Please enter your mobile number.";
+    if (!formData.email.trim()) return "Please enter your email address.";
+    if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
+      return "Please enter a valid email address.";
+    }
+  }
+
+  return "";
+};
+
+const getQuoteSubmissionError = (formData, validationState) => {
+  for (const step of [1, 2, 3, 4, 5]) {
+    const error = getQuoteStepError(step, formData, validationState);
+    if (error) {
+      return { step, error };
+    }
+  }
+
+  return { step: 5, error: "" };
+};
+
 function StandardCard({ item, onCtaClick }) {
   return (
     <article
@@ -1412,6 +1477,7 @@ function QuoteFormModal({ isOpen, onClose }) {
   const isBundlePath = formData.buildPath === "bundle";
   const isCuratePath = formData.buildPath === "curate";
   const isRoamingBooth = formData.boothChoice === "Roaming Booth (Digitals)";
+  const validationState = { isWedding, isBundlePath, isCuratePath, isRoamingBooth };
   const progressWidth = `${(step / 5) * 100}%`;
   const stepTag = step === 3 ? (isBundlePath ? "3B" : "3A") : String(step);
 
@@ -1519,61 +1585,10 @@ function QuoteFormModal({ isOpen, onClose }) {
     });
   };
 
-  const validateStep = () => {
-    if (step === 1) {
-      if (!formData.eventType) return "Please select your event type.";
-      if (!formData.dateNotSure && !formData.eventDate) {
-        return "Please choose your event date or tick “Not sure yet”.";
-      }
-      if (
-        !formData.dateNotSure &&
-        !/^\d{4}-\d{2}-\d{2}$/.test(formData.eventDate.trim())
-      ) {
-        return "Please choose a valid event date.";
-      }
-      if (!formData.guestCount || Number(formData.guestCount) <= 0) {
-        return "Please enter a valid guest count.";
-      }
-    }
+  const validateStep = (stepToValidate = step) =>
+    getQuoteStepError(stepToValidate, formData, validationState);
 
-    if (step === 2 && !formData.buildPath) {
-      return "Please choose how you'd like to build your experience.";
-    }
-
-    if (step === 3) {
-      if (isCuratePath) {
-        if (!formData.boothChoice) return "Please choose your main booth experience.";
-        if (isRoamingBooth && !formData.roamingPrinting) {
-          return "Please select your roaming printing preference.";
-        }
-      }
-
-      if (isBundlePath && !formData.bundleChoice) {
-        return "Please choose a bundle option.";
-      }
-    }
-
-    if (step === 4) {
-      if (!formData.hireDuration) return "Please select the hire duration.";
-      if (isWedding && formData.hireDuration === "3 hours") {
-        return "For weddings, minimum booking is 4 hours.";
-      }
-      if (!formData.eventStartTime) return "Please choose an event start time.";
-      if (!formData.eventFinishTime) return "Please choose an event finish time.";
-      if (!formData.venueAddress.trim()) return "Please add venue suburb or address.";
-    }
-
-    if (step === 5) {
-      if (!formData.fullName.trim()) return "Please enter your name.";
-      if (!formData.mobile.trim()) return "Please enter your mobile number.";
-      if (!formData.email.trim()) return "Please enter your email address.";
-      if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
-        return "Please enter a valid email address.";
-      }
-    }
-
-    return "";
-  };
+  const validateSubmission = () => getQuoteSubmissionError(formData, validationState);
 
   const handleNext = () => {
     if (isSubmitting) return;
@@ -1594,9 +1609,10 @@ function QuoteFormModal({ isOpen, onClose }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const error = validateStep();
+    const { error, step: invalidStep } = validateSubmission();
     if (error) {
       setFormError(error);
+      setStep(invalidStep);
       return;
     }
     setFormError("");
@@ -1605,7 +1621,7 @@ function QuoteFormModal({ isOpen, onClose }) {
     const payload = buildQuoteWebhookPayload(formData, bundleChoices);
 
     try {
-      const response = await fetch(quoteWebhookUrl, {
+      const response = await fetch(quoteSubmitPath, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -1614,36 +1630,19 @@ function QuoteFormModal({ isOpen, onClose }) {
       });
 
       if (!response.ok) {
-        throw new Error(`Webhook request failed with status ${response.status}`);
+        const { error: submitError } = await response.json().catch(() => ({}));
+        throw new Error(submitError || `Webhook request failed with status ${response.status}`);
       }
 
       trackQuoteConversion();
       trackMetaLead();
       setIsSubmitted(true);
     } catch (errorCaught) {
-      if (errorCaught instanceof TypeError) {
-        try {
-          await fetch(quoteWebhookUrl, {
-            method: "POST",
-            mode: "no-cors",
-            headers: {
-              "Content-Type": "text/plain;charset=UTF-8"
-            },
-            body: JSON.stringify(payload)
-          });
-          trackQuoteConversion();
-          trackMetaLead();
-          setIsSubmitted(true);
-        } catch {
-          setFormError(
-            "Couldn’t submit right now. Please try again, or contact us directly."
-          );
-        }
-      } else {
-        setFormError(
-          "Couldn’t submit right now. Please try again, or contact us directly."
-        );
-      }
+      setFormError(
+        errorCaught instanceof Error && errorCaught.message
+          ? errorCaught.message
+          : "Couldn’t submit right now. Please try again, or contact us directly."
+      );
     } finally {
       setIsSubmitting(false);
     }
