@@ -435,9 +435,10 @@ const upgrades = [
   },
   {
     id: "fireworks-dry-ice",
-    name: "Grand entrance fireworks + dry ice",
+    name: "Fireworks & Dry Ice package",
     category: "Atmosphere & Entrance",
-    summary: "Full wow-moment package for dramatic stage reveal and spotlight entry.",
+    summary:
+      "Includes 4x FW for entrance, 2x FW for cake cutting, 6x FW for first dance, plus dry ice.",
     price: 1100,
     priceLabel: "from $1,100",
     photo:
