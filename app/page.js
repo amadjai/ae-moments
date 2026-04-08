@@ -674,7 +674,12 @@ const formatEventDate = (eventDate) => {
   return `${day}/${month}/${year}`;
 };
 
-function buildQuoteWebhookPayload(formData, bundleChoices) {
+const hasFullName = (value) => {
+  const normalized = String(value ?? "").trim().replace(/\s+/g, " ");
+  return normalized.split(" ").filter(Boolean).length >= 2;
+};
+
+function buildQuoteWebhookPayload(formData) {
   const submittedAt = new Date().toISOString();
   const guestCount = Number(formData.guestCount) || 0;
   const isWedding = formData.eventType === "Wedding";
@@ -690,10 +695,6 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
   const quickUpgradesText = quickUpgrades.length
     ? quickUpgrades.join("; ")
     : "None selected";
-  const bundleChoicesText =
-    bundleChoices && bundleChoices.length
-      ? bundleChoices.join("; ")
-      : "No bundle options";
   const escapeHtml = (value) =>
     String(value ?? "")
       .replace(/&/g, "&amp;")
@@ -722,7 +723,6 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
     boothChoice: formData.boothChoice || "",
     roamingPrinting: formData.roamingPrinting || "",
     bundleChoice: formData.bundleChoice || "",
-    bundleChoicesShown: bundleChoicesText,
     quickUpgrades: quickUpgrades,
     quickUpgradesText,
     hireDuration: formData.hireDuration || "",
@@ -755,7 +755,6 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
     ["Booth Choice", automationFields.boothChoice || "N/A"],
     ["Roaming Printing", automationFields.roamingPrinting || "N/A"],
     ["Bundle Choice", automationFields.bundleChoice || "N/A"],
-    ["Bundle Options Shown", automationFields.bundleChoicesShown],
     ["Quick Upgrades", quickUpgradesText],
     ["Hire Duration", automationFields.hireDuration || "N/A"],
     ["Event Start Time", automationFields.eventStartTime || "N/A"],
@@ -817,8 +816,7 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
         : null,
       bundle: isBundlePath
         ? {
-            bundleChoice: formData.bundleChoice || null,
-            optionsShown: bundleChoices
+            bundleChoice: formData.bundleChoice || null
           }
         : null
     },
@@ -827,7 +825,7 @@ function buildQuoteWebhookPayload(formData, bundleChoices) {
       eventStartTime: formData.eventStartTime || null,
       eventFinishTime: formData.eventFinishTime || null,
       venueName: formData.venueName || null,
-      venueSuburbAddress: formData.venueAddress || null,
+      venueAddress: formData.venueAddress || null,
       ceremonyAndReceptionSameVenue: isWedding ? formData.sameVenue || null : null
     },
     contact: {
@@ -1065,11 +1063,15 @@ const getQuoteStepError = (step, formData, validationState) => {
     }
     if (!formData.eventStartTime) return "Please choose an event start time.";
     if (!formData.eventFinishTime) return "Please choose an event finish time.";
-    if (!formData.venueAddress.trim()) return "Please add venue suburb or address.";
+    if (!formData.venueName.trim()) return "Please enter a venue name.";
+    if (!formData.venueAddress.trim()) return "Please add a venue address.";
   }
 
   if (step === 5) {
-    if (!formData.fullName.trim()) return "Please enter your name.";
+    if (!formData.fullName.trim()) return "Please enter your full name.";
+    if (!hasFullName(formData.fullName)) {
+      return "Please enter your first and last name.";
+    }
     if (!formData.mobile.trim()) return "Please enter your mobile number.";
     if (!formData.email.trim()) return "Please enter your email address.";
     if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
@@ -1620,7 +1622,7 @@ function QuoteFormModal({ isOpen, onClose }) {
     setFormError("");
     setIsSubmitting(true);
 
-    const payload = buildQuoteWebhookPayload(formData, bundleChoices);
+    const payload = buildQuoteWebhookPayload(formData);
 
     try {
       const response = await fetch(quoteWebhookUrl, {
@@ -2004,22 +2006,23 @@ function QuoteFormModal({ isOpen, onClose }) {
                 </label>
 
                 <label className="quote-field">
-                  <span>Venue name</span>
+                  <span>Venue Name*</span>
                   <input
                     type="text"
                     value={formData.venueName}
                     onChange={(event) => setField("venueName", event.target.value)}
-                    placeholder="Optional"
+                    placeholder="E.g. Highline Venue"
+                    required
                   />
                 </label>
 
                 <label className="quote-field">
-                  <span>Venue suburb / address*</span>
+                  <span>Venue Address*</span>
                   <input
                     type="text"
                     value={formData.venueAddress}
                     onChange={(event) => setField("venueAddress", event.target.value)}
-                    placeholder="Suburb or full address"
+                    placeholder="E.g. Level 3/462 Chapel Rd, Bankstown"
                     required
                   />
                 </label>
@@ -2056,7 +2059,7 @@ function QuoteFormModal({ isOpen, onClose }) {
                 <h3 id="quote-modal-title">Where should we send your quote?</h3>
 
                 <label className="quote-field">
-                  <span>Name*</span>
+                  <span>Full Name*</span>
                   <input
                     type="text"
                     value={formData.fullName}
@@ -2319,7 +2322,6 @@ export default function Home() {
     }
 
     activeVideoNode.muted = true;
-    activeVideoNode.defaultMuted = true;
     activeVideoNode.volume = 0;
     const playback = activeVideoNode.play();
     if (playback && typeof playback.then === "function") {
@@ -2424,7 +2426,6 @@ export default function Home() {
         const videoNode = showcaseVideoRefs.current[index];
         if (!videoNode) return;
         videoNode.muted = true;
-        videoNode.defaultMuted = true;
         videoNode.volume = 0;
         videoNode.playsInline = true;
         videoNode.setAttribute("muted", "");
@@ -2478,7 +2479,6 @@ export default function Home() {
           preload="auto"
           controls={false}
           muted
-          defaultMuted
           loop
           autoPlay
           onPlay={() => {
