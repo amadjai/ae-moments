@@ -213,7 +213,7 @@ const standardRates = [
     ],
     pricingLines: [
       "Digitals only: 3hrs $1,000 | 4hrs $1,200 | 5hrs $1,400",
-      "Digitals + printing: 3hrs $1,150 | 4hrs $1,300 | 5hrs $1,550"
+      "Digitals + printing: 3hrs $1,150 | 4hrs $1,350 | 5hrs $1,550"
     ],
     outputs: ["Roaming Coverage", "Digitals", "Prints (optional)"]
   }
@@ -1058,7 +1058,7 @@ const getQuoteStepError = (step, formData, validationState) => {
 
   if (step === 4) {
     if (!formData.hireDuration) return "Please select the hire duration.";
-    if (isWedding && formData.hireDuration === "3 hours") {
+    if (isWedding && (formData.hireDuration === "3 hours" || formData.hireDuration === "3.5 hours")) {
       return "For weddings, minimum booking is 4 hours.";
     }
     if (!formData.eventStartTime) return "Please choose an event start time.";
@@ -1960,27 +1960,29 @@ function QuoteFormModal({ isOpen, onClose }) {
                     and packed down after formalities to avoid disruption. For
                     this reason, we require a minimum 4 hour booking.
                   </p>
-                  <div className="quote-inline-options">
-                    {["3 hours", "4 hours", "5 hours", "6 hours or more"].map(
-                      (option) => (
-                        <label
-                          key={option}
-                          className={`quote-chip-option ${
-                            formData.hireDuration === option ? "is-active" : ""
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="hireDuration"
-                            value={option}
-                            checked={formData.hireDuration === option}
-                            onChange={(event) => setField("hireDuration", event.target.value)}
-                          />
-                          <span>{option}</span>
-                        </label>
-                      )
-                    )}
-                  </div>
+                  <select
+                    className="quote-select"
+                    value={formData.hireDuration}
+                    onChange={(event) => setField("hireDuration", event.target.value)}
+                    required
+                  >
+                    <option value="">Select duration</option>
+                    {[
+                      "3 hours",
+                      "3.5 hours",
+                      "4 hours",
+                      "4.5 hours",
+                      "5 hours",
+                      "5.5 hours",
+                      "6 hours",
+                      "6.5 hours",
+                      "7 or more hours"
+                    ].map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
                 </fieldset>
 
                 <label className="quote-field">
