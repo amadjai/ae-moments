@@ -3,6 +3,23 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCards } from "swiper/modules";
+import {
+  standardRates,
+  upgrades,
+  upgradeCategoryOrder,
+  getUpgradeQuoteLabel,
+  quoteBoothChoices,
+  quoteQuickUpgrades
+} from "./lib/catalog";
+import {
+  formatEventDate,
+  quoteEventTypes,
+  quoteFormInitialState,
+  getQuoteStepError,
+  getQuoteSubmissionError,
+  buildQuoteWebhookPayload
+} from "./lib/quote";
+
 
 const proofStrip = [
   "Professional Standard Gear",
@@ -145,162 +162,6 @@ const audienceIllustrationImages = {
 
 const pricingSurchargeNote = "additional travel & parking surcharges may apply";
 
-const standardRates = [
-  {
-    name: "Open Air Booth",
-    badge: "Flagship / best for high-end photos",
-    description:
-      "Sleek, compact, fits almost anywhere—and delivers the biggest “wow, we look amazing” factor.",
-    image:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698c2f277f6dcf6f1903c436.png",
-    features: [
-      "Studio-grade mirrorless photo output",
-      "Unlimited sessions during hire",
-      "Instant high-quality prints available",
-      "Online gallery included after event",
-      "Friendly on-site attendant included"
-    ],
-    pricingLines: ["3hrs $730", "4hrs $850", "5hrs $970"],
-    outputs: ["Prints", "Digitals"]
-  },
-  {
-    name: "Mirror Booth",
-    badge: "Interactive + statement piece",
-    description:
-      "The “walk up and play” booth guests crowd around—perfect if you want theatre + wow.",
-    image:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698c2f27017707587ac557d5.png",
-    features: [
-      "Interactive mirror for the perfect wow factor",
-      "Instant high-quality prints available",
-      "Online gallery provided after event via email",
-      "Luxury look that instantly elevates any event space"
-    ],
-    pricingLines: ["3hrs $930", "4hrs $1,050", "5hrs $1,170"],
-    featured: true,
-    outputs: ["Prints", "Digitals"]
-  },
-  {
-    name: "360 Video Booth",
-    badge: "Viral content energy",
-    description:
-      "For the hype reels, spins, dance moves, and instant share moments.",
-    image:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698c2f277305aa17ea747c77.png",
-    features: [
-      "High-energy rotating video moments",
-      "Instant share-ready clips for socials",
-      "Attendant-managed guest flow",
-      "Branding overlays available",
-      "Perfect for dancefloor or activations"
-    ],
-    pricingLines: ["3hrs $980", "4hrs $1,100", "5hrs $1,220"],
-    outputs: ["Video", "Digitals"]
-  },
-  {
-    name: "Roaming Booth",
-    badge: "The booth comes to the guests",
-    description:
-      "Mobile camera/tripod setup that moves around the venue, capturing guests wherever the action is.",
-    image:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698c2f2752c952b70bf254ff.png",
-    features: [
-      "Candid, fun shots with real reactions and energy",
-      "Great for large venues/outdoor spaces",
-      "Ideal for corporate events and brand activations",
-      "Flexible setup with fast event coverage",
-      "Moves around the venue wherever the action is"
-    ],
-    pricingLines: [
-      "Digitals only: 3hrs $1,000 | 4hrs $1,200 | 5hrs $1,400",
-      "Digitals + printing: 3hrs $1,150 | 4hrs $1,350 | 5hrs $1,550"
-    ],
-    outputs: ["Roaming Coverage", "Digitals", "Prints (optional)"]
-  }
-];
-
-const bundles = [
-  {
-    name: "Open Air Booth Essentials Bundle",
-    label: "Silver Value",
-    tier: "silver",
-    tierLabel: "Silver Value",
-    tierCopy: "Best value starter bundle",
-    plan: "5-hour bundle",
-    bestFor: "Best for up to 350 guests",
-    intro: "",
-    includes: [
-      "Open Air Booth (5hrs) — $970",
-      "Glam Booth (B&W Hollywood) — $110",
-      "Guest Book Print Service — $55",
-      "Signature Guest Book Set — $135"
-    ],
-    trueCost: "$1,215",
-    bundlePrice: "$1,124",
-    savings: "$91",
-    why: [
-      "Studio quality output with a clean, simple setup",
-      "Includes premium keepsake upgrades",
-      "Great value for medium to large guest counts"
-    ]
-  },
-  {
-    name: "Corporate Brand Experience Bundle",
-    label: "Gold Value",
-    tier: "gold",
-    tierLabel: "Gold Value",
-    tierCopy: "Corporate content bundle",
-    plan: "5-hour bundle",
-    featured: true,
-    bestFor: "Best for corporate events",
-    intro: "",
-    includes: [
-      "Open Air Booth (5hrs) — $970",
-      "360 Booth (5hrs) — $1,220",
-      "Glam Booth — $110",
-      "Print Upgrade (Postcard 4×6 or Polaroid 3×4) — $165",
-      "Commemorative Photo Album — $100"
-    ],
-    trueCost: "$2,565",
-    bundlePrice: "$2,270",
-    savings: "$295",
-    why: [
-      "Built for engagement and content variety",
-      "Mix of booth, video, and branded print upgrades",
-      "Great fit for conferences and activations"
-    ]
-  },
-  {
-    name: "Platinum Celebration Bundle",
-    label: "Platinum Value",
-    tier: "platinum",
-    tierLabel: "Platinum Value",
-    tierCopy: "Maximum event coverage",
-    plan: "5-hour bundle",
-    bestFor: "Best for 400+ guests",
-    intro: "",
-    includes: [
-      "Open Air Booth (5hrs) — $970",
-      "Mirror Booth (5hrs) — $1,170",
-      "360 Booth (5hrs) — $1,220",
-      "Roaming Booth (5hrs, digitals + printing) — $1,550",
-      "Dry Ice (Dancing on clouds) — $420",
-      "Audio Guest Book — $300",
-      "Glam Booth — $110",
-      "Print Upgrade (Polaroid 3×4 or Postcard 4×6) — $165",
-      "Commemorative Photo Album — $100"
-    ],
-    trueCost: "$4,840",
-    bundlePrice: "$4,114",
-    savings: "$726",
-    why: [
-      "Built for large guest numbers and event scale",
-      "Maximum variety and throughput across the venue",
-      "Premium keepsakes and visual upgrades included"
-    ]
-  }
-];
-
 const included = [
   "Delivery, setup, pack-down and travel",
   "Dedicated booth attendant for the full duration of your booking",
@@ -329,139 +190,6 @@ const bookingAccessDetails = [
     title: "Private online gallery",
     meta: "High-res download access"
   }
-];
-
-const upgrades = [
-  {
-    id: "print-magnets",
-    name: "Print magnets",
-    category: "Print & Keepsakes",
-    summary:
-      "15x15mm magnets (sheets of 100), ideal for practical keepsakes guests can take home.",
-    price: 22,
-    priceLabel: "$22",
-    photo:
-      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/69980411f83453b98269564f.jpeg"
-  },
-  {
-    id: "guest-book-print",
-    name: "Guest book print service",
-    category: "Print & Keepsakes",
-    summary: "We print and place duplicate strips directly into your guest book.",
-    price: 55,
-    priceLabel: "$55",
-    photo:
-      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/699804113a2afdfe2641a03f.jpg"
-  },
-  {
-    id: "leather-guest-book",
-    name: "Leather guest book set",
-    category: "Print & Keepsakes",
-    summary: "Premium leather guest book kit styled for elegant keepsake signing.",
-    price: 135,
-    priceLabel: "$135",
-    photo:
-      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/69980411df9bdf7b2146893f.jpg"
-  },
-  {
-    id: "photo-album",
-    name: "Photo album",
-    category: "Print & Keepsakes",
-    summary: "Commemorative event album that collects your standout moments.",
-    price: 100,
-    priceLabel: "$100",
-    photo:
-      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/69980411df9bdf7e2e46893e.jpg"
-  },
-  {
-    id: "polaroid-3x4",
-    name: "Polaroid-style 3×4",
-    category: "Print & Keepsakes",
-    summary: "Retro-style mini print format with a classic border finish.",
-    price: 165,
-    priceLabel: "$165",
-    photo:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc635ea0716cddd7057a.webp"
-  },
-  {
-    id: "postcard-4x6",
-    name: "Postcard 4×6",
-    category: "Print & Keepsakes",
-    summary: "Larger postcard print format for premium, frame-ready outputs.",
-    price: 165,
-    priceLabel: "$165",
-    photo:
-      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/69980411f83453c9e8695653.jpg"
-  },
-  {
-    id: "glam-booth",
-    name: "Glam Booth (B&W Hollywood)",
-    category: "Photo Styling",
-    summary: "High-contrast black-and-white look with smooth, flattering skin finish.",
-    price: 110,
-    priceLabel: "$110",
-    photo:
-      "https://assets.cdn.filesafe.space/KbLyUwHy2FrboitSpuPl/media/6998041120c035c29a42093b.jpg"
-  },
-  {
-    id: "luxury-rose-wall",
-    name: "Luxury rose wall",
-    category: "Photo Styling",
-    summary: "Statement floral backdrop for editorial portraits and styled arrivals.",
-    price: 440,
-    priceLabel: "$440",
-    photo:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc635b7c9687ccdd63e7.webp"
-  },
-  {
-    id: "audio-guest-book",
-    name: "Audio guest book",
-    category: "Experience Add-ons",
-    summary: "Capture heartfelt voice messages your couple or host can replay later.",
-    price: 300,
-    priceLabel: "$300",
-    photo:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc63000761703fba2861.webp"
-  },
-  {
-    id: "dry-ice",
-    name: "Dry ice “dancing on clouds”",
-    category: "Atmosphere & Entrance",
-    summary: "Cloud-floor effect for cinematic first dance and reception entrance.",
-    price: 420,
-    priceLabel: "$420",
-    photo:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc630084985ede7b56a0.jpeg"
-  },
-  {
-    id: "fireworks-dry-ice",
-    name: "Fireworks & Dry Ice package",
-    category: "Atmosphere & Entrance",
-    summary:
-      "Includes 4x FW for entrance, 2x FW for cake cutting, 6x FW for first dance, plus dry ice.",
-    price: 1100,
-    priceLabel: "from $1,100",
-    photo:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc6324813cdf927d0cbb.jpg"
-  },
-  {
-    id: "dj-service",
-    name: "DJ services",
-    category: "Entertainment",
-    summary: "Subject-to-availability DJ set to keep energy and dancefloor flow high.",
-    price: 1200,
-    priceLabel: "from $1,200",
-    photo:
-      "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698dcc635ea0711e86d7057c.jpg"
-  }
-];
-
-const upgradeCategoryOrder = [
-  "Print & Keepsakes",
-  "Photo Styling",
-  "Experience Add-ons",
-  "Atmosphere & Entrance",
-  "Entertainment"
 ];
 
 const compareRows = [
@@ -666,215 +394,6 @@ const trackMetaLead = () => {
   window.fbq("track", "Lead");
 };
 
-const formatEventDate = (eventDate) => {
-  const value = String(eventDate || "").trim();
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (!match) return value;
-  const [, year, month, day] = match;
-  return `${day}/${month}/${year}`;
-};
-
-const hasFullName = (value) => {
-  const normalized = String(value ?? "").trim().replace(/\s+/g, " ");
-  return normalized.split(" ").filter(Boolean).length >= 2;
-};
-
-function buildQuoteWebhookPayload(formData) {
-  const submittedAt = new Date().toISOString();
-  const guestCount = Number(formData.guestCount) || 0;
-  const isWedding = formData.eventType === "Wedding";
-  const isCuratePath = formData.buildPath === "curate";
-  const isBundlePath = formData.buildPath === "bundle";
-  const quickUpgrades = formData.quickUpgrades ?? [];
-  const normalizedEventDate = formData.dateNotSure
-    ? ""
-    : formatEventDate(formData.eventDate);
-  const selectedPathLabel = isBundlePath
-    ? "Bundle & save money"
-    : "Curate my own photo booth experience";
-  const quickUpgradesText = quickUpgrades.length
-    ? quickUpgrades.join("; ")
-    : "None selected";
-  const escapeHtml = (value) =>
-    String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-
-  const summaryLine = [
-    `${formData.eventType || "Event type not set"}`,
-    `${guestCount || "?"} guests`,
-    formData.dateNotSure ? "Date not set" : normalizedEventDate || "Date not set",
-    selectedPathLabel
-  ].join(" | ");
-
-  const automationFields = {
-    submittedAt,
-    sourceForm: "AE Moments Quote Popup",
-    summaryLine,
-    eventType: formData.eventType || "",
-    eventDate: normalizedEventDate,
-    eventDateNotSure: Boolean(formData.dateNotSure),
-    guestCount: guestCount || "",
-    buildPath: formData.buildPath || "",
-    buildPathLabel: selectedPathLabel,
-    boothChoice: formData.boothChoice || "",
-    roamingPrinting: formData.roamingPrinting || "",
-    bundleChoice: formData.bundleChoice || "",
-    quickUpgrades: quickUpgrades,
-    quickUpgradesText,
-    hireDuration: formData.hireDuration || "",
-    eventStartTime: formData.eventStartTime || "",
-    eventFinishTime: formData.eventFinishTime || "",
-    venueName: formData.venueName || "",
-    venueAddress: formData.venueAddress || "",
-    weddingSameVenue: formData.sameVenue || "",
-    fullName: formData.fullName || "",
-    partnerName: formData.partnerName || "",
-    mobile: formData.mobile || "",
-    email: formData.email || "",
-    instagramHandle: formData.instagram || "",
-    message: formData.message || ""
-  };
-
-  const automationDigestItems = [
-    ["Submitted At", submittedAt],
-    ["Form Source", "AE Moments Quote Popup"],
-    ["Summary", summaryLine],
-    ["Event Type", automationFields.eventType || "N/A"],
-    [
-      "Event Date",
-      automationFields.eventDateNotSure
-        ? "Not sure yet"
-        : automationFields.eventDate || "N/A"
-    ],
-    ["Guest Count", automationFields.guestCount || "N/A"],
-    ["Build Path", automationFields.buildPathLabel],
-    ["Booth Choice", automationFields.boothChoice || "N/A"],
-    ["Roaming Printing", automationFields.roamingPrinting || "N/A"],
-    ["Bundle Choice", automationFields.bundleChoice || "N/A"],
-    ["Quick Upgrades", quickUpgradesText],
-    ["Hire Duration", automationFields.hireDuration || "N/A"],
-    ["Event Start Time", automationFields.eventStartTime || "N/A"],
-    ["Event Finish Time", automationFields.eventFinishTime || "N/A"],
-    ["Venue Name", automationFields.venueName || "N/A"],
-    ["Venue Address", automationFields.venueAddress || "N/A"],
-    [
-      "Ceremony & Reception Same Venue",
-      automationFields.weddingSameVenue || "N/A"
-    ],
-    ["Name", automationFields.fullName || "N/A"],
-    ["Partner Name", automationFields.partnerName || "N/A"],
-    ["Mobile", automationFields.mobile || "N/A"],
-    ["Email", automationFields.email || "N/A"],
-    ["Instagram", automationFields.instagramHandle || "N/A"],
-    ["Message", automationFields.message || "N/A"]
-  ];
-
-  const automationDigestText = `<ul>${automationDigestItems
-    .map(
-      ([label, value]) =>
-        `<li><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</li>`
-    )
-    .join("")}</ul>`;
-
-  return {
-    webhookVersion: "1.1",
-    submissionId:
-      typeof crypto !== "undefined" && crypto.randomUUID
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
-    submittedAt,
-    source: {
-      formName: "AE Moments Quote Popup",
-      pageUrl: typeof window !== "undefined" ? window.location.href : "",
-      referrer: typeof document !== "undefined" ? document.referrer : "",
-      timezone:
-        typeof Intl !== "undefined"
-          ? Intl.DateTimeFormat().resolvedOptions().timeZone
-          : "",
-      userAgent: typeof navigator !== "undefined" ? navigator.userAgent : ""
-    },
-    eventBasics: {
-      eventType: formData.eventType || null,
-      eventDateStatus: formData.dateNotSure ? "not_sure_yet" : "confirmed_date",
-      eventDate: normalizedEventDate || null,
-      guestCount
-    },
-    experiencePath: {
-      pathMode: formData.buildPath || null,
-      pathLabel: selectedPathLabel,
-      curate: isCuratePath
-        ? {
-            boothChoice: formData.boothChoice || null,
-            roamingPrintingPreference: formData.roamingPrinting || null,
-            quickUpgradesSelected: quickUpgrades,
-            quickUpgradesCount: quickUpgrades.length
-          }
-        : null,
-      bundle: isBundlePath
-        ? {
-            bundleChoice: formData.bundleChoice || null
-          }
-        : null
-    },
-    timingVenue: {
-      hireDuration: formData.hireDuration || null,
-      eventStartTime: formData.eventStartTime || null,
-      eventFinishTime: formData.eventFinishTime || null,
-      venueName: formData.venueName || null,
-      venueAddress: formData.venueAddress || null,
-      ceremonyAndReceptionSameVenue: isWedding ? formData.sameVenue || null : null
-    },
-    contact: {
-      name: formData.fullName || null,
-      partnerName: isWedding ? formData.partnerName || null : null,
-      mobile: formData.mobile || null,
-      email: formData.email || null,
-      instagramHandle: formData.instagram || null
-    },
-    notes: {
-      message: formData.message || null
-    },
-    summary: {
-      summaryLine,
-      selectedBooth: isCuratePath ? formData.boothChoice || null : null,
-      selectedBundle: isBundlePath ? formData.bundleChoice || null : null,
-      hasQuickUpgrades: quickUpgrades.length > 0
-    },
-    automationDigest: {
-      text: automationDigestText,
-      fields: automationFields
-    },
-    flat: {
-      event_type: formData.eventType || "",
-      event_date: normalizedEventDate,
-      event_date_not_sure: Boolean(formData.dateNotSure),
-      guest_count: guestCount || "",
-      build_path: formData.buildPath || "",
-      booth_choice: formData.boothChoice || "",
-      roaming_printing: formData.roamingPrinting || "",
-      bundle_choice: formData.bundleChoice || "",
-      quick_upgrades: quickUpgrades.join(" | "),
-      quick_upgrades_count: quickUpgrades.length,
-      hire_duration: formData.hireDuration || "",
-      event_start_time: formData.eventStartTime || "",
-      event_finish_time: formData.eventFinishTime || "",
-      venue_name: formData.venueName || "",
-      venue_address: formData.venueAddress || "",
-      wedding_same_venue: formData.sameVenue || "",
-      full_name: formData.fullName || "",
-      partner_name: formData.partnerName || "",
-      mobile: formData.mobile || "",
-      email: formData.email || "",
-      instagram_handle: formData.instagram || "",
-      special_requests: formData.message || ""
-    }
-  };
-}
-
 const faqs = [
   {
     question:
@@ -972,127 +491,6 @@ const heroReviewerAvatars = [
 ];
 const tickerSlots = ["slot-top", "slot-center", "slot-bottom"];
 
-const quoteEventTypes = [
-  "Wedding",
-  "Engagement",
-  "Birthday",
-  "Corporate events",
-  "Product activation",
-  "School formal",
-  "Other occasion"
-];
-
-const quoteQuickUpgrades = [
-  "1 extra print for your own guest book - $55",
-  "Leather guest book + gold pens + glue + 1 extra print - $135",
-  "Photo Album + 1 extra print - $100",
-  "15x15mm magnets (sheets of 100) (min. 1 per guest, rounded up to the nearest 100) - $22",
-  "Upgrade to 3x4\" polaroid prints - $165",
-  "Upgrade to 4x6\" postcard prints - $165",
-  "Glam booth upgrade (black & white photos) - $110",
-  "Rose Wall hire with photo booth package - $440",
-  "Audio Guest Book (white) - $300",
-  "Dry Ice Fog Machine only - $420",
-  "Fireworks & dry ice package - from $1100",
-  "Acrylic welcome sign - from $180",
-  "Acrylic seating chart - from $250",
-  "DJ package + equipment - 5 hours from $1200"
-];
-
-const quoteFormInitialState = {
-  eventType: "",
-  eventDate: "",
-  dateNotSure: false,
-  guestCount: "",
-  buildPath: "",
-  boothChoice: "",
-  roamingPrinting: "",
-  quickUpgrades: [],
-  bundleChoice: "",
-  hireDuration: "",
-  eventStartTime: "",
-  eventFinishTime: "",
-  venueName: "",
-  venueAddress: "",
-  sameVenue: "",
-  fullName: "",
-  partnerName: "",
-  mobile: "",
-  email: "",
-  instagram: "",
-  message: ""
-};
-
-const getQuoteStepError = (step, formData, validationState) => {
-  const { isWedding, isBundlePath, isCuratePath, isRoamingBooth } = validationState;
-
-  if (step === 1) {
-    if (!formData.eventType) return "Please select your event type.";
-    if (!formData.dateNotSure && !formData.eventDate) {
-      return "Please choose your event date or tick “Not sure yet”.";
-    }
-    if (!formData.dateNotSure && !/^\d{4}-\d{2}-\d{2}$/.test(formData.eventDate.trim())) {
-      return "Please choose a valid event date.";
-    }
-    if (!formData.guestCount || Number(formData.guestCount) <= 0) {
-      return "Please enter a valid guest count.";
-    }
-  }
-
-  if (step === 2 && !formData.buildPath) {
-    return "Please choose how you'd like to build your experience.";
-  }
-
-  if (step === 3) {
-    if (isCuratePath) {
-      if (!formData.boothChoice) return "Please choose your main booth experience.";
-      if (isRoamingBooth && !formData.roamingPrinting) {
-        return "Please select your roaming printing preference.";
-      }
-    }
-
-    if (isBundlePath && !formData.bundleChoice) {
-      return "Please choose a bundle option.";
-    }
-  }
-
-  if (step === 4) {
-    if (!formData.hireDuration) return "Please select the hire duration.";
-    if (isWedding && (formData.hireDuration === "3 hours" || formData.hireDuration === "3.5 hours")) {
-      return "For weddings, minimum booking is 4 hours.";
-    }
-    if (!formData.eventStartTime) return "Please choose an event start time.";
-    if (!formData.eventFinishTime) return "Please choose an event finish time.";
-    if (!formData.venueName.trim()) return "Please enter a venue name.";
-    if (!formData.venueAddress.trim()) return "Please add a venue address.";
-  }
-
-  if (step === 5) {
-    if (!formData.fullName.trim()) return "Please enter your full name.";
-    if (!hasFullName(formData.fullName)) {
-      return "Please enter your first and last name.";
-    }
-    if (!formData.mobile.trim()) return "Please enter your mobile number.";
-    if (!formData.email.trim()) return "Please enter your email address.";
-    if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
-      return "Please enter a valid email address.";
-    }
-  }
-
-  return "";
-};
-
-const getQuoteSubmissionError = (formData, validationState) => {
-  for (const step of [1, 2, 3, 4, 5]) {
-    const error = getQuoteStepError(step, formData, validationState);
-    if (error) {
-      return { step, error };
-    }
-  }
-
-  return { step: 5, error: "" };
-};
-
 function StandardCard({ item, onCtaClick }) {
   return (
     <article
@@ -1137,7 +535,7 @@ function StandardCard({ item, onCtaClick }) {
         ))}
       </div>
       <div className="package-price-block">
-        <p className="package-price-label">Standard rates from</p>
+        <p className="package-price-label">{item.priceHeading || "Standard rates"}</p>
         <div className="package-price-lines">
           {item.pricingLines.map((line) => (
             <p key={line}>{line}</p>
@@ -1246,60 +644,6 @@ function AudienceIllustration({ type, label }) {
       loading="lazy"
       decoding="async"
     />
-  );
-}
-
-function BundleCard({ item, onCtaClick }) {
-  return (
-    <article
-      className={`card bundle-card ${item.featured ? "featured" : ""}`}
-      data-reveal
-    >
-      <div className={`bundle-tier-card ${item.tier}`}>
-        <p className="bundle-tier-name">{item.tierLabel}</p>
-        <img
-          className="bundle-tier-logo"
-          src={siteLogoUrl}
-          alt="AE Moments logo"
-          loading="lazy"
-          decoding="async"
-        />
-        <p className="bundle-tier-copy">{item.tierCopy}</p>
-        <p className="bundle-tier-save">Save {item.savings}</p>
-      </div>
-      <div className="bundle-top">
-        <p className="bundle-plan">{item.plan}</p>
-        <p className="bundle-pill">{item.label}</p>
-      </div>
-      <h3>{item.name}</h3>
-      <p className="meta">{item.bestFor}</p>
-      {item.intro ? <p>{item.intro}</p> : null}
-      <div className="bundle-pricing">
-        <p className="bundle-price-row bundle-price-old">
-          <span>True cost</span> <s>{item.trueCost}</s>
-        </p>
-        <p className="bundle-price-row bundle-price-now">
-          <span>Bundle price</span> <strong>{item.bundlePrice}</strong>
-        </p>
-        <p className="save">Save {item.savings}</p>
-        <p className="package-price-note">{pricingSurchargeNote}</p>
-      </div>
-      <h4>Includes</h4>
-      <ul className="line-list bundle-includes">
-        {item.includes.map((entry) => (
-          <li key={entry}>{entry}</li>
-        ))}
-      </ul>
-      <h4>Why it works</h4>
-      <ul className="line-list bundle-why">
-        {item.why.map((entry) => (
-          <li key={entry}>{entry}</li>
-        ))}
-      </ul>
-      <a href="#quote" className="package-action bundle-action" onClick={onCtaClick}>
-        Get Quote / Check Availability
-      </a>
-    </article>
   );
 }
 
@@ -1470,7 +814,7 @@ function CompareSection() {
   );
 }
 
-function QuoteFormModal({ isOpen, onClose }) {
+function QuoteFormModal({ isOpen, onClose, selectedUpgrades }) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState(quoteFormInitialState);
   const [formError, setFormError] = useState("");
@@ -1478,53 +822,22 @@ function QuoteFormModal({ isOpen, onClose }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isWedding = formData.eventType === "Wedding";
-  const isBundlePath = formData.buildPath === "bundle";
-  const isCuratePath = formData.buildPath === "curate";
   const isRoamingBooth = formData.boothChoice === "Roaming Booth (Digitals)";
-  const validationState = { isWedding, isBundlePath, isCuratePath, isRoamingBooth };
-  const progressWidth = `${(step / 5) * 100}%`;
-  const stepTag = step === 3 ? (isBundlePath ? "3B" : "3A") : String(step);
-
-  const bundleChoices = useMemo(() => {
-    const recommend = "Recommend for me";
-
-    if (formData.eventType === "Wedding") {
-      return [
-        "Open Air Booth Essentials Bundle",
-        "Platinum Celebration Bundle",
-        "Corporate Brand Experience Bundle",
-        recommend
-      ];
-    }
-
-    if (
-      formData.eventType === "Corporate events" ||
-      formData.eventType === "Product activation"
-    ) {
-      return [
-        "Corporate Brand Experience Bundle",
-        "Open Air Booth Essentials Bundle",
-        "Platinum Celebration Bundle",
-        recommend
-      ];
-    }
-
-    return [
-      "Open Air Booth Essentials Bundle",
-      "Corporate Brand Experience Bundle",
-      "Platinum Celebration Bundle",
-      recommend
-    ];
-  }, [formData.eventType]);
+  const validationState = { isWedding, isRoamingBooth };
+  const progressWidth = `${(step / 4) * 100}%`;
+  const stepTag = String(step);
 
   useEffect(() => {
     if (!isOpen) return;
     setStep(1);
-    setFormData(quoteFormInitialState);
+    setFormData({
+      ...quoteFormInitialState,
+      quickUpgrades: selectedUpgrades.map(getUpgradeQuoteLabel)
+    });
     setFormError("");
     setIsSubmitted(false);
     setIsSubmitting(false);
-  }, [isOpen]);
+  }, [isOpen, selectedUpgrades]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -1555,14 +868,8 @@ function QuoteFormModal({ isOpen, onClose }) {
         next.sameVenue = "";
       }
 
-      if (field === "buildPath") {
-        if (value === "bundle") {
-          next.boothChoice = "";
-          next.roamingPrinting = "";
-          next.quickUpgrades = [];
-        } else {
-          next.bundleChoice = "";
-        }
+      if (field === "boothChoice" && value !== current.boothChoice) {
+        next.hireDuration = "";
       }
 
       if (field === "boothChoice" && value !== "Roaming Booth (Digitals)") {
@@ -1602,7 +909,7 @@ function QuoteFormModal({ isOpen, onClose }) {
       return;
     }
     setFormError("");
-    setStep((current) => Math.min(5, current + 1));
+    setStep((current) => Math.min(4, current + 1));
   };
 
   const handleBack = () => {
@@ -1622,7 +929,7 @@ function QuoteFormModal({ isOpen, onClose }) {
     setFormError("");
     setIsSubmitting(true);
 
-    const payload = buildQuoteWebhookPayload(formData);
+    const payload = buildQuoteWebhookPayload(formData, "AE Moments Quote Popup");
 
     try {
       const response = await fetch(quoteWebhookUrl, {
@@ -1712,7 +1019,7 @@ function QuoteFormModal({ isOpen, onClose }) {
         ) : (
           <form className="quote-modal-form" onSubmit={handleSubmit}>
             <header className="quote-modal-head">
-              <p className="quote-modal-kicker">Step {stepTag} of 5</p>
+              <p className="quote-modal-kicker">Step {stepTag} of 4</p>
               <div className="quote-progress">
                 <span style={{ width: progressWidth }} />
               </div>
@@ -1798,58 +1105,9 @@ function QuoteFormModal({ isOpen, onClose }) {
 
             {step === 2 && (
               <section className="quote-step-body">
-                <h3 id="quote-modal-title">How would you like to build your experience?</h3>
-                <div className="quote-choice-grid">
-                  <label
-                    className={`quote-choice-card ${
-                      formData.buildPath === "curate" ? "is-active" : ""
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="buildPath"
-                      value="curate"
-                      checked={formData.buildPath === "curate"}
-                      onChange={(event) => setField("buildPath", event.target.value)}
-                    />
-                    <span className="quote-choice-title">
-                      Curate my own photo booth experience
-                    </span>
-                    <span className="quote-choice-copy">
-                      Choose your booth and a few quick add-ons.
-                    </span>
-                  </label>
-                  <label
-                    className={`quote-choice-card ${
-                      formData.buildPath === "bundle" ? "is-active" : ""
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="buildPath"
-                      value="bundle"
-                      checked={formData.buildPath === "bundle"}
-                      onChange={(event) => setField("buildPath", event.target.value)}
-                    />
-                    <span className="quote-choice-title">Bundle & save money ⭐</span>
-                    <span className="quote-choice-copy">
-                      Pick a proven setup and lock in clear savings.
-                    </span>
-                  </label>
-                </div>
-              </section>
-            )}
-
-            {step === 3 && isCuratePath && (
-              <section className="quote-step-body">
                 <h3 id="quote-modal-title">Choose your main experience</h3>
                 <div className="quote-choice-grid">
-                  {[
-                    "Open Air Booth (Prints + Digitals)",
-                    "Mirror Booth (Prints + Digitals)",
-                    "360 Video Booth (360 clips)",
-                    "Roaming Booth (Digitals)"
-                  ].map((option) => (
+                  {quoteBoothChoices.map((option) => (
                     <label
                       key={option}
                       className={`quote-choice-card ${
@@ -1921,35 +1179,7 @@ function QuoteFormModal({ isOpen, onClose }) {
               </section>
             )}
 
-            {step === 3 && isBundlePath && (
-              <section className="quote-step-body">
-                <h3 id="quote-modal-title">Choose a bundle & save</h3>
-                <p className="quote-helper">
-                  Showing the most relevant bundles for your event type.
-                </p>
-                <div className="quote-choice-grid">
-                  {bundleChoices.map((option) => (
-                    <label
-                      key={option}
-                      className={`quote-choice-card ${
-                        formData.bundleChoice === option ? "is-active" : ""
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="bundleChoice"
-                        value={option}
-                        checked={formData.bundleChoice === option}
-                        onChange={(event) => setField("bundleChoice", event.target.value)}
-                      />
-                      <span className="quote-choice-title">{option}</span>
-                    </label>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {step === 4 && (
+            {step === 3 && (
               <section className="quote-step-body">
                 <h3 id="quote-modal-title">Event timing & location</h3>
 
@@ -1967,6 +1197,11 @@ function QuoteFormModal({ isOpen, onClose }) {
                     required
                   >
                     <option value="">Select duration</option>
+                    {formData.boothChoice === "Long term Enclosed Booth (Custom quote)" && (
+                      <option value="Long-term hire / discuss duration">
+                        Long-term hire / discuss duration
+                      </option>
+                    )}
                     {[
                       "3 hours",
                       "3.5 hours",
@@ -2056,7 +1291,7 @@ function QuoteFormModal({ isOpen, onClose }) {
               </section>
             )}
 
-            {step === 5 && (
+            {step === 4 && (
               <section className="quote-step-body">
                 <h3 id="quote-modal-title">Where should we send your quote?</h3>
 
@@ -2141,7 +1376,7 @@ function QuoteFormModal({ isOpen, onClose }) {
                 <span />
               )}
 
-              {step < 5 ? (
+              {step < 4 ? (
                 <button
                   type="button"
                   className="quote-btn quote-btn-solid"
@@ -2170,7 +1405,6 @@ function QuoteFormModal({ isOpen, onClose }) {
 }
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState("standard");
   const [activeFaq, setActiveFaq] = useState(0);
   const [isAccessFlipped, setIsAccessFlipped] = useState(false);
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
@@ -2280,10 +1514,7 @@ export default function Home() {
     );
   };
 
-  const scrollToPackages = (tab) => {
-    if (tab) {
-      setActiveTab(tab);
-    }
+  const scrollToPackages = () => {
     if (typeof window !== "undefined") {
       document
         .getElementById("packages")
@@ -2296,13 +1527,6 @@ export default function Home() {
       event.preventDefault();
     }
     scrollToPackages();
-  };
-
-  const openBundleTab = (event) => {
-    if (event) {
-      event.preventDefault();
-    }
-    scrollToPackages("bundle");
   };
 
   const pauseShowcaseVideos = () => {
@@ -2412,7 +1636,7 @@ export default function Home() {
 
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, [activeTab]);
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -2859,59 +2083,18 @@ export default function Home() {
           <SectionPill label="Packages" />
           <h2 data-reveal>Studio-quality booths. Seamless setup. Unforgettable guest experience.</h2>
           <p className="section-lead package-lead" data-reveal>
-            Flexible hire durations and premium bundle options designed for weddings, corporate activations, and private events.
+            Flexible hire durations and booth experiences for weddings, corporate activations, and private events, plus long-term branded installations.
           </p>
-          <div className="tabs" data-reveal>
-            <button
-              className={activeTab === "standard" ? "active" : ""}
-              onClick={() => setActiveTab("standard")}
-            >
-              Standard Rates
-            </button>
-            <div className="bundle-tab-wrap">
-              <span
-                className={`bundle-save-tooltip ${
-                  activeTab === "bundle" ? "is-active" : ""
-                }`}
-                aria-hidden="true"
-              >
-                Save Up to 15%
-              </span>
-              <button
-                className={`bundle-tab-button ${
-                  activeTab === "bundle" ? "active" : ""
-                }`}
-                onClick={() => setActiveTab("bundle")}
-              >
-                <span className="bundle-tab-shimmer">
-                  Bundle & Save (Save Up to 15%)
-                </span>
-              </button>
+          <div className="panel">
+            <div className="package-grid">
+              {standardRates.map((item) => (
+                <StandardCard
+                  key={item.name}
+                  item={item}
+                  onCtaClick={openQuoteModal}
+                />
+              ))}
             </div>
-          </div>
-
-          <div className="panel" key={activeTab}>
-            {activeTab === "standard" ? (
-              <div className="package-grid">
-                {standardRates.map((item) => (
-                  <StandardCard
-                    key={item.name}
-                    item={item}
-                    onCtaClick={openQuoteModal}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="bundle-grid">
-                {bundles.map((item) => (
-                  <BundleCard
-                    key={item.name}
-                    item={item}
-                    onCtaClick={openQuoteModal}
-                  />
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </section>
@@ -3131,9 +2314,9 @@ export default function Home() {
                 <button
                   type="button"
                   className="upgrade-basket-cta upgrade-basket-cta-secondary"
-                  onClick={openBundleTab}
+                  onClick={openPackagesSection}
                 >
-                  View Package Bundles
+                  View Booth Packages
                 </button>
               </div>
             </aside>
@@ -3265,7 +2448,11 @@ export default function Home() {
         </div>
       </section>
 
-      <QuoteFormModal isOpen={isQuoteModalOpen} onClose={closeQuoteModal} />
+      <QuoteFormModal
+        isOpen={isQuoteModalOpen}
+        onClose={closeQuoteModal}
+        selectedUpgrades={upgradeBasket}
+      />
 
       <footer className="site-footer">
         <video

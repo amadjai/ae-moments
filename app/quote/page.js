@@ -1,6 +1,16 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import { quoteBoothChoices, quoteQuickUpgrades } from "../lib/catalog";
+import {
+  formatEventDate,
+  quoteEventTypes,
+  quoteFormInitialState,
+  getQuoteStepError,
+  getQuoteSubmissionError,
+  buildQuoteWebhookPayload
+} from "../lib/quote";
+
 
 const siteLogoUrl =
   "https://storage.googleapis.com/msgsndr/KbLyUwHy2FrboitSpuPl/media/698d55d552c9526c6c263eb3.png";
@@ -21,336 +31,6 @@ const trackMetaLead = () => {
   window.fbq("track", "Lead");
 };
 
-const formatEventDate = (eventDate) => {
-  const value = String(eventDate || "").trim();
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (!match) return value;
-  const [, year, month, day] = match;
-  return `${day}/${month}/${year}`;
-};
-
-const hasFullName = (value) => {
-  const normalized = String(value ?? "").trim().replace(/\s+/g, " ");
-  return normalized.split(" ").filter(Boolean).length >= 2;
-};
-
-const quoteEventTypes = [
-  "Wedding",
-  "Engagement",
-  "Birthday",
-  "Corporate events",
-  "Product activation",
-  "School formal",
-  "Other occasion"
-];
-
-const quoteQuickUpgrades = [
-  "1 extra print for your own guest book - $55",
-  "Leather guest book + gold pens + glue + 1 extra print - $135",
-  "Photo Album + 1 extra print - $100",
-  "15x15mm magnets (sheets of 100) (min. 1 per guest, rounded up to the nearest 100) - $22",
-  "Upgrade to 3x4\" polaroid prints - $165",
-  "Upgrade to 4x6\" postcard prints - $165",
-  "Glam booth upgrade (black & white photos) - $110",
-  "Rose Wall hire with photo booth package - $440",
-  "Audio Guest Book (white) - $300",
-  "Dry Ice Fog Machine only - $420",
-  "Fireworks & dry ice package - from $1100",
-  "Acrylic welcome sign - from $180",
-  "Acrylic seating chart - from $250",
-  "DJ package + equipment - 5 hours from $1200"
-];
-
-const quoteFormInitialState = {
-  eventType: "",
-  eventDate: "",
-  dateNotSure: false,
-  guestCount: "",
-  buildPath: "",
-  boothChoice: "",
-  roamingPrinting: "",
-  quickUpgrades: [],
-  bundleChoice: "",
-  hireDuration: "",
-  eventStartTime: "",
-  eventFinishTime: "",
-  venueName: "",
-  venueAddress: "",
-  sameVenue: "",
-  fullName: "",
-  partnerName: "",
-  mobile: "",
-  email: "",
-  instagram: "",
-  message: ""
-};
-
-const getQuoteStepError = (step, formData, validationState) => {
-  const { isWedding, isBundlePath, isCuratePath, isRoamingBooth } = validationState;
-
-  if (step === 1) {
-    if (!formData.eventType) return "Please select your event type.";
-    if (!formData.dateNotSure && !formData.eventDate) {
-      return "Please choose your event date or tick “Not sure yet”.";
-    }
-    if (!formData.dateNotSure && !/^\d{4}-\d{2}-\d{2}$/.test(formData.eventDate.trim())) {
-      return "Please choose a valid event date.";
-    }
-    if (!formData.guestCount || Number(formData.guestCount) <= 0) {
-      return "Please enter a valid guest count.";
-    }
-  }
-
-  if (step === 2 && !formData.buildPath) {
-    return "Please choose how you'd like to build your experience.";
-  }
-
-  if (step === 3) {
-    if (isCuratePath) {
-      if (!formData.boothChoice) return "Please choose your main booth experience.";
-      if (isRoamingBooth && !formData.roamingPrinting) {
-        return "Please select your roaming printing preference.";
-      }
-    }
-
-    if (isBundlePath && !formData.bundleChoice) {
-      return "Please choose a bundle option.";
-    }
-  }
-
-  if (step === 4) {
-    if (!formData.hireDuration) return "Please select the hire duration.";
-    if (isWedding && (formData.hireDuration === "3 hours" || formData.hireDuration === "3.5 hours")) {
-      return "For weddings, minimum booking is 4 hours.";
-    }
-    if (!formData.eventStartTime) return "Please choose an event start time.";
-    if (!formData.eventFinishTime) return "Please choose an event finish time.";
-    if (!formData.venueName.trim()) return "Please enter a venue name.";
-    if (!formData.venueAddress.trim()) return "Please add a venue address.";
-  }
-
-  if (step === 5) {
-    if (!formData.fullName.trim()) return "Please enter your full name.";
-    if (!hasFullName(formData.fullName)) {
-      return "Please enter your first and last name.";
-    }
-    if (!formData.mobile.trim()) return "Please enter your mobile number.";
-    if (!formData.email.trim()) return "Please enter your email address.";
-    if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
-      return "Please enter a valid email address.";
-    }
-  }
-
-  return "";
-};
-
-const getQuoteSubmissionError = (formData, validationState) => {
-  for (const step of [1, 2, 3, 4, 5]) {
-    const error = getQuoteStepError(step, formData, validationState);
-    if (error) {
-      return { step, error };
-    }
-  }
-
-  return { step: 5, error: "" };
-};
-
-function buildQuoteWebhookPayload(formData) {
-  const submittedAt = new Date().toISOString();
-  const guestCount = Number(formData.guestCount) || 0;
-  const isWedding = formData.eventType === "Wedding";
-  const isCuratePath = formData.buildPath === "curate";
-  const isBundlePath = formData.buildPath === "bundle";
-  const quickUpgrades = formData.quickUpgrades ?? [];
-  const normalizedEventDate = formData.dateNotSure
-    ? ""
-    : formatEventDate(formData.eventDate);
-  const selectedPathLabel = isBundlePath
-    ? "Bundle & save money"
-    : "Curate my own photo booth experience";
-  const quickUpgradesText = quickUpgrades.length
-    ? quickUpgrades.join("; ")
-    : "None selected";
-  const escapeHtml = (value) =>
-    String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-
-  const summaryLine = [
-    `${formData.eventType || "Event type not set"}`,
-    `${guestCount || "?"} guests`,
-    formData.dateNotSure ? "Date not set" : normalizedEventDate || "Date not set",
-    selectedPathLabel
-  ].join(" | ");
-
-  const automationFields = {
-    submittedAt,
-    sourceForm: "AE Moments Quote Page",
-    summaryLine,
-    eventType: formData.eventType || "",
-    eventDate: normalizedEventDate,
-    eventDateNotSure: Boolean(formData.dateNotSure),
-    guestCount: guestCount || "",
-    buildPath: formData.buildPath || "",
-    buildPathLabel: selectedPathLabel,
-    boothChoice: formData.boothChoice || "",
-    roamingPrinting: formData.roamingPrinting || "",
-    bundleChoice: formData.bundleChoice || "",
-    quickUpgrades: quickUpgrades,
-    quickUpgradesText,
-    hireDuration: formData.hireDuration || "",
-    eventStartTime: formData.eventStartTime || "",
-    eventFinishTime: formData.eventFinishTime || "",
-    venueName: formData.venueName || "",
-    venueAddress: formData.venueAddress || "",
-    weddingSameVenue: formData.sameVenue || "",
-    fullName: formData.fullName || "",
-    partnerName: formData.partnerName || "",
-    mobile: formData.mobile || "",
-    email: formData.email || "",
-    instagramHandle: formData.instagram || "",
-    message: formData.message || ""
-  };
-
-  const automationDigestItems = [
-    ["Submitted At", submittedAt],
-    ["Form Source", "AE Moments Quote Page"],
-    ["Summary", summaryLine],
-    ["Event Type", automationFields.eventType || "N/A"],
-    [
-      "Event Date",
-      automationFields.eventDateNotSure
-        ? "Not sure yet"
-        : automationFields.eventDate || "N/A"
-    ],
-    ["Guest Count", automationFields.guestCount || "N/A"],
-    ["Build Path", automationFields.buildPathLabel],
-    ["Booth Choice", automationFields.boothChoice || "N/A"],
-    ["Roaming Printing", automationFields.roamingPrinting || "N/A"],
-    ["Bundle Choice", automationFields.bundleChoice || "N/A"],
-    ["Quick Upgrades", quickUpgradesText],
-    ["Hire Duration", automationFields.hireDuration || "N/A"],
-    ["Event Start Time", automationFields.eventStartTime || "N/A"],
-    ["Event Finish Time", automationFields.eventFinishTime || "N/A"],
-    ["Venue Name", automationFields.venueName || "N/A"],
-    ["Venue Address", automationFields.venueAddress || "N/A"],
-    [
-      "Ceremony & Reception Same Venue",
-      automationFields.weddingSameVenue || "N/A"
-    ],
-    ["Name", automationFields.fullName || "N/A"],
-    ["Partner Name", automationFields.partnerName || "N/A"],
-    ["Mobile", automationFields.mobile || "N/A"],
-    ["Email", automationFields.email || "N/A"],
-    ["Instagram", automationFields.instagramHandle || "N/A"],
-    ["Message", automationFields.message || "N/A"]
-  ];
-
-  const automationDigestText = `<ul>${automationDigestItems
-    .map(
-      ([label, value]) =>
-        `<li><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</li>`
-    )
-    .join("")}</ul>`;
-
-  return {
-    webhookVersion: "1.2",
-    submissionId:
-      typeof crypto !== "undefined" && crypto.randomUUID
-        ? crypto.randomUUID()
-        : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
-    submittedAt,
-    source: {
-      formName: "AE Moments Quote Page",
-      pageUrl: typeof window !== "undefined" ? window.location.href : "",
-      referrer: typeof document !== "undefined" ? document.referrer : "",
-      timezone:
-        typeof Intl !== "undefined"
-          ? Intl.DateTimeFormat().resolvedOptions().timeZone
-          : "",
-      userAgent: typeof navigator !== "undefined" ? navigator.userAgent : ""
-    },
-    eventBasics: {
-      eventType: formData.eventType || null,
-      eventDateStatus: formData.dateNotSure ? "not_sure_yet" : "confirmed_date",
-      eventDate: normalizedEventDate || null,
-      guestCount
-    },
-    experiencePath: {
-      pathMode: formData.buildPath || null,
-      pathLabel: selectedPathLabel,
-      curate: isCuratePath
-        ? {
-            boothChoice: formData.boothChoice || null,
-            roamingPrintingPreference: formData.roamingPrinting || null,
-            quickUpgradesSelected: quickUpgrades,
-            quickUpgradesCount: quickUpgrades.length
-          }
-        : null,
-      bundle: isBundlePath
-        ? {
-            bundleChoice: formData.bundleChoice || null
-          }
-        : null
-    },
-    timingVenue: {
-      hireDuration: formData.hireDuration || null,
-      eventStartTime: formData.eventStartTime || null,
-      eventFinishTime: formData.eventFinishTime || null,
-      venueName: formData.venueName || null,
-      venueAddress: formData.venueAddress || null,
-      ceremonyAndReceptionSameVenue: isWedding ? formData.sameVenue || null : null
-    },
-    contact: {
-      name: formData.fullName || null,
-      partnerName: isWedding ? formData.partnerName || null : null,
-      mobile: formData.mobile || null,
-      email: formData.email || null,
-      instagramHandle: formData.instagram || null
-    },
-    notes: {
-      message: formData.message || null
-    },
-    summary: {
-      summaryLine,
-      selectedBooth: isCuratePath ? formData.boothChoice || null : null,
-      selectedBundle: isBundlePath ? formData.bundleChoice || null : null,
-      hasQuickUpgrades: quickUpgrades.length > 0
-    },
-    automationDigest: {
-      text: automationDigestText,
-      fields: automationFields
-    },
-    flat: {
-      event_type: formData.eventType || "",
-      event_date: normalizedEventDate,
-      event_date_not_sure: Boolean(formData.dateNotSure),
-      guest_count: guestCount || "",
-      build_path: formData.buildPath || "",
-      booth_choice: formData.boothChoice || "",
-      roaming_printing: formData.roamingPrinting || "",
-      bundle_choice: formData.bundleChoice || "",
-      quick_upgrades: quickUpgrades.join(" | "),
-      quick_upgrades_count: quickUpgrades.length,
-      hire_duration: formData.hireDuration || "",
-      event_start_time: formData.eventStartTime || "",
-      event_finish_time: formData.eventFinishTime || "",
-      venue_name: formData.venueName || "",
-      venue_address: formData.venueAddress || "",
-      wedding_same_venue: formData.sameVenue || "",
-      full_name: formData.fullName || "",
-      partner_name: formData.partnerName || "",
-      mobile: formData.mobile || "",
-      email: formData.email || "",
-      instagram_handle: formData.instagram || "",
-      special_requests: formData.message || ""
-    }
-  };
-}
-
 export default function QuotePage() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState(quoteFormInitialState);
@@ -359,44 +39,10 @@ export default function QuotePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isWedding = formData.eventType === "Wedding";
-  const isBundlePath = formData.buildPath === "bundle";
-  const isCuratePath = formData.buildPath === "curate";
   const isRoamingBooth = formData.boothChoice === "Roaming Booth (Digitals)";
-  const validationState = { isWedding, isBundlePath, isCuratePath, isRoamingBooth };
-  const progressWidth = `${(step / 5) * 100}%`;
-  const stepTag = step === 3 ? (isBundlePath ? "3B" : "3A") : String(step);
-
-  const bundleChoices = useMemo(() => {
-    const recommend = "Recommend for me";
-
-    if (formData.eventType === "Wedding") {
-      return [
-        "Open Air Booth Essentials Bundle",
-        "Platinum Celebration Bundle",
-        "Corporate Brand Experience Bundle",
-        recommend
-      ];
-    }
-
-    if (
-      formData.eventType === "Corporate events" ||
-      formData.eventType === "Product activation"
-    ) {
-      return [
-        "Corporate Brand Experience Bundle",
-        "Open Air Booth Essentials Bundle",
-        "Platinum Celebration Bundle",
-        recommend
-      ];
-    }
-
-    return [
-      "Open Air Booth Essentials Bundle",
-      "Corporate Brand Experience Bundle",
-      "Platinum Celebration Bundle",
-      recommend
-    ];
-  }, [formData.eventType]);
+  const validationState = { isWedding, isRoamingBooth };
+  const progressWidth = `${(step / 4) * 100}%`;
+  const stepTag = String(step);
 
   const setField = (field, value) => {
     setFormData((current) => {
@@ -407,14 +53,8 @@ export default function QuotePage() {
         next.sameVenue = "";
       }
 
-      if (field === "buildPath") {
-        if (value === "bundle") {
-          next.boothChoice = "";
-          next.roamingPrinting = "";
-          next.quickUpgrades = [];
-        } else {
-          next.bundleChoice = "";
-        }
+      if (field === "boothChoice" && value !== current.boothChoice) {
+        next.hireDuration = "";
       }
 
       if (field === "boothChoice" && value !== "Roaming Booth (Digitals)") {
@@ -454,7 +94,7 @@ export default function QuotePage() {
       return;
     }
     setFormError("");
-    setStep((current) => Math.min(5, current + 1));
+    setStep((current) => Math.min(4, current + 1));
   };
 
   const handleBack = () => {
@@ -578,7 +218,7 @@ export default function QuotePage() {
             ) : (
               <form className="quote-modal-form" onSubmit={handleSubmit}>
                 <header className="quote-modal-head">
-                  <p className="quote-modal-kicker">Step {stepTag} of 5</p>
+                  <p className="quote-modal-kicker">Step {stepTag} of 4</p>
                   <div className="quote-progress">
                     <span style={{ width: progressWidth }} />
                   </div>
@@ -670,62 +310,9 @@ export default function QuotePage() {
 
                 {step === 2 && (
                   <section className="quote-step-body">
-                    <h3>How would you like to build your experience?</h3>
-                    <div className="quote-choice-grid">
-                      <label
-                        className={`quote-choice-card ${
-                          formData.buildPath === "curate" ? "is-active" : ""
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="buildPath"
-                          value="curate"
-                          checked={formData.buildPath === "curate"}
-                          onChange={(event) =>
-                            setField("buildPath", event.target.value)
-                          }
-                        />
-                        <span className="quote-choice-title">
-                          Curate my own photo booth experience
-                        </span>
-                        <span className="quote-choice-copy">
-                          Choose your booth and a few quick add-ons.
-                        </span>
-                      </label>
-                      <label
-                        className={`quote-choice-card ${
-                          formData.buildPath === "bundle" ? "is-active" : ""
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="buildPath"
-                          value="bundle"
-                          checked={formData.buildPath === "bundle"}
-                          onChange={(event) =>
-                            setField("buildPath", event.target.value)
-                          }
-                        />
-                        <span className="quote-choice-title">Bundle & save money ⭐</span>
-                        <span className="quote-choice-copy">
-                          Pick a proven setup and lock in clear savings.
-                        </span>
-                      </label>
-                    </div>
-                  </section>
-                )}
-
-                {step === 3 && isCuratePath && (
-                  <section className="quote-step-body">
                     <h3>Choose your main experience</h3>
                     <div className="quote-choice-grid">
-                      {[
-                        "Open Air Booth (Prints + Digitals)",
-                        "Mirror Booth (Prints + Digitals)",
-                        "360 Video Booth (360 clips)",
-                        "Roaming Booth (Digitals)"
-                      ].map((option) => (
+                      {quoteBoothChoices.map((option) => (
                         <label
                           key={option}
                           className={`quote-choice-card ${
@@ -799,37 +386,7 @@ export default function QuotePage() {
                   </section>
                 )}
 
-                {step === 3 && isBundlePath && (
-                  <section className="quote-step-body">
-                    <h3>Choose a bundle & save</h3>
-                    <p className="quote-helper">
-                      Showing the most relevant bundles for your event type.
-                    </p>
-                    <div className="quote-choice-grid">
-                      {bundleChoices.map((option) => (
-                        <label
-                          key={option}
-                          className={`quote-choice-card ${
-                            formData.bundleChoice === option ? "is-active" : ""
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="bundleChoice"
-                            value={option}
-                            checked={formData.bundleChoice === option}
-                            onChange={(event) =>
-                              setField("bundleChoice", event.target.value)
-                            }
-                          />
-                          <span className="quote-choice-title">{option}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
-                {step === 4 && (
+                {step === 3 && (
                   <section className="quote-step-body">
                     <h3>Event timing & location</h3>
 
@@ -847,6 +404,11 @@ export default function QuotePage() {
                         required
                       >
                         <option value="">Select duration</option>
+                        {formData.boothChoice === "Long term Enclosed Booth (Custom quote)" && (
+                          <option value="Long-term hire / discuss duration">
+                            Long-term hire / discuss duration
+                          </option>
+                        )}
                         {[
                           "3 hours",
                           "3.5 hours",
@@ -944,7 +506,7 @@ export default function QuotePage() {
                   </section>
                 )}
 
-                {step === 5 && (
+                {step === 4 && (
                   <section className="quote-step-body">
                     <h3>Where should we send your quote?</h3>
 
@@ -1031,7 +593,7 @@ export default function QuotePage() {
                     <span />
                   )}
 
-                  {step < 5 ? (
+                  {step < 4 ? (
                     <button
                       type="button"
                       className="quote-btn quote-btn-solid"
